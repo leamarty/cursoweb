@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel='stylesheet' href='css/bootstrap.css'>
+    <script type='text/javascript' src="jquery.js"></script>
+    <title>Curso web</title>
+    <script type='text/javascript'>
+        var personas = '[' +
+            '{"nombre": "Ale", "apellido": "Marty", "edad": 24},' +
+            '{"nombre": "Gasti", "apellido": "Pisera", "edad": 25},' +
+            '{"nombre": "Chubi", "apellido": "Neitor", "edad": 45}' +
+        ']';
+        personas = JSON.parse(personas);
+
+        $(document).ready(function() {
+            $('#columna1').click(function() {
+                //$(this).html('<a bimbo="pepe" href="asd.com">LINK</a>');
+                /*var i = 1;
+                $('.columna').each(function() {
+                    $(this).text('Esta es la iteracion ' + i);
+                    i++;
+                });*/
+            });
+
+            $(personas).each(function(key, value) {
+                //alert(value.nombre + ' ' + value.apellido);
+                $('#tabla-personas tbody').append(
+                    $('<tr>').append(
+                        $('<td>').text(value.nombre),
+                        $('<td>').text(value.apellido),
+                        $('<td>').text(value.edad)
+                    )
+                );
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container text-center">
+        <h1>Título del curso</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <h1 class="alert-danger">Hola</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <td>Título de columa 1</td>
+                                    <td>Título de columa 2</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="columna1">Columna 1</td>
+                                    <td class="columna">Columna 2</td>
+                                </tr>
+                                <tr>
+                                    <td class="columna">Columna 1</td>
+                                    <td class="columna">Columna 2</td>
+                                </tr>
+                                <tr>
+                                    <td class="columna">Columna 1</td>
+                                    <td class="columna">Columna 2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <table id="tabla-personas" class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <td>Nombre</td>
+                            <td>Apellido</td>
+                            <td>Edad</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Acá van las personas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!--
+    <div>
+        <ul>
+            <li class="negrita letra-grande">Opcion 1</li>
+            <li class="opcion-verde">Opcion 2</li>
+            <li class="opcion-roja">Opcion 3</li>
+        </ul>
+    </div>
+    <div id="boton">
+        <input type="button" value="Boton 1">
+    </div>
+    <div>
+        <p class="negrita subrayado letra-grande">Este es un párrafo de prueba</p>
+    </div>
+    -->
+</body>
+</html>
