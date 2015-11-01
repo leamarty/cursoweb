@@ -1,0 +1,28 @@
+{
+  "name": "modulo 1",
+  "version": "0.0.1",
+  "homepage": "https://github.com/leamarty/cursoweb",
+  "description": "Listado de clientes",
+  "main": "index.html",
+  "moduleType": [],
+  "keywords": [
+    "curso"
+  ],
+  "authors": [
+    "Ale",
+    "Bimbo y Pepe"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.5"
+  }
+}
