@@ -14,7 +14,7 @@
 
             $("a#boton-buscar").click(function () {
 
-                $(this).addClass("disabled");
+                $(this).text("Buscando clientes").addClass("disabled");
 
                 var i;
                 for (i = 0; i < 10; i++) {
@@ -24,37 +24,35 @@
                     }
 
                     var a = clientes[i + siguiente_cliente];
-                    /* a partir de la imagen txt=20, el texto es muy largo para un tamaño de imagen tan chico.
-                       modifico la url aca para no modificar clientes.js */
-                    var logo = a.logo.replace("w=32", "w=36").replace("h=32", "h=36");
-                    var patrimonio_neto = a.activo - a.pasivo;
-
-                    var tds = [
-                        $("<td>").append(
-                                $("<img>").attr("src", logo)
-                        ).addClass("text-center"),
-                        $("<td>").text(a.id).addClass("text-center"),
-                        $("<td>").text(a.razonSocial).addClass("text-center"),
-                        $("<td>").text(a.direccion.calle + " " + a.direccion.altura + ", " + a.direccion.ciudad),
-                        $("<td>").text(a.presidente.nombre + " " + a.presidente.apellido),
-                        $("<td>").text("$ " + patrimonio_neto.toFixed(2)).addClass((patrimonio_neto < 0) ? "bg-danger" : "bg-success").addClass("text-right"),
-                        $("<td>").text(a.fechaCreacion)
-                    ];
-                    $(tds).each(function () {
-                        $(this).addClass("vcenter");
-                    });
 
                     /* uso prepend() en vez de append() para insertar los elementos
                        arriba de todo en la tabla en vez de al final */
                     $("table#tabla-clientes>tbody").prepend(
-                            $("<tr>").append(tds)
+                            $("<tr>").append(
+                                    $("<td>").append(
+                                            /* a partir de la imagen txt=20, el texto es muy largo para un tamaño de imagen tan chico.
+                                             modifico la url aca para no modificar clientes.js */
+                                            $("<img>").attr("src", a.logo.replace("w=32", "w=36").replace("h=32", "h=36"))
+                                    ).addClass("text-center"),
+                                    $("<td>").text(a.id).addClass("text-center"),
+                                    $("<td>").text(a.razonSocial).addClass("text-center"),
+                                    $("<td>").text(a.direccion.calle + " " + a.direccion.altura + ", " + a.direccion.ciudad),
+                                    $("<td>").text(a.presidente.nombre + " " + a.presidente.apellido),
+                                    $("<td>").text("$ " + (a.activo - a.pasivo).toFixed(2)).addClass((a.activo - a.pasivo < 0) ? "bg-danger" : "bg-success").addClass("text-right"),
+                                    $("<td>").text(a.fechaCreacion)
+                            /* uso children() para buscar todos los td's recien creados y les agrego una clase */
+                            /* tengo que usar parent() al final porque si no, devuelve el td en vez del tr
+                               y necesito agregar el tr al tbody */
+                            ).children("td").addClass("vcenter").parent()
                     );
                 }
 
                 siguiente_cliente = siguiente_cliente + i;
 
                 if (siguiente_cliente < clientes.length) {
-                    $(this).removeClass("disabled");
+                    $(this).text("Buscar 10 clientes más").removeClass("disabled");
+                } else {
+                    $(this).text("No hay mas clientes");
                 }
             });
         });
