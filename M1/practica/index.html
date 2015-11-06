@@ -2,107 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel='stylesheet' href='bower_components/bootstrap/dist/css/bootstrap.css'>
-    <script type='text/javascript' src="bower_components/jquery/dist/jquery.js"></script>
-    <title>Curso web</title>
-    <script type='text/javascript'>
-        var personas = [
-            {"nombre": "Alejandro", "apellido": "Marty", "edad": 24},
-            {"nombre": "Gasti", "apellido": "Pisera", "edad": 25},
-            {"nombre": "Chubi", "apellido": "Neitor", "edad": 45}
-        ];
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="clientes.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var aux=10;
+            var aux1=0;
+            $("#search").click(function () {
 
-        $(document).ready(function() {
-            $('#columna1').click(function() {
-                //$(this).html('<a bimbo="pepe" href="asd.com">LINK</a>');
-                var i = 2;
-                $('.columna').each(function() {
-                    $(this).text('Esta es la iteracion ' + i);
-                    i++;
-                });
-            });
+                for(var i=aux1;i<aux;i++) {
+                    $(clientes[i]).each(function (key, value) {
 
-            $(personas).each(function(key, value) {
-                $('#tabla-personas tbody').append(
-                    $('<tr>').append(
-                        $('<td>').text(value.nombre),
-                        $('<td>').text(value.apellido),
-                        $('<td>').text(value.edad)
-                    )
-                );
+                        if (value.activo - value.pasivo < 0) {
+                            var aux = "warning";
+                        } else {
+                            aux = "success"
+                        }
+                        $('#tabla-clientes>tbody').append(
+                                $("<tr>").append(
+                                        $("<td>").html("<img src='" + value.logo + "'>"),
+                                        $("<td>").text(value.id),
+                                        $("<td>").text(value.razonSocial),
+                                        $("<td>").text(value.direccion.calle + " " + value.direccion.altura + ", " + value.direccion.ciudad + ", " + value.direccion.pais),
+                                        $("<td>").text(value.presidente.nombre),
+                                        $("<td class='" + aux + "'>").text("$" + (value.activo - value.pasivo).toFixed(2)),
+                                        $("<td>").text(value.fechaCreacion)
+                                )
+                        )
+
+
+                    });
+                }
+                aux=aux+10;
+                aux1=aux1+10;
+                if(aux1>35){
+                    $("#search").attr("disabled",true);
+                }
+
+
+
             });
         });
     </script>
+    <title>TelapongSA</title>
+
 </head>
 <body>
-    <div class="container text-center">
-        <h1>Título del curso</h1>
-    </div>
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-6">
-                <div class="row">
-                    <div class="col-xs-6">
-                        <h1 class="alert-danger">Hola</h1>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-6">
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <td>Título de columa 1</td>
-                                    <td>Título de columa 2</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td id="columna1">Columna 1</td>
-                                    <td class="columna">Columna 2</td>
-                                </tr>
-                                <tr>
-                                    <td class="columna">Columna 1</td>
-                                    <td class="columna">Columna 2</td>
-                                </tr>
-                                <tr>
-                                    <td class="columna">Columna 1</td>
-                                    <td class="columna">Columna 2</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-6">
-                <table id="tabla-personas" class="table table-striped table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <td>Nombre</td>
-                            <td>Apellido</td>
-                            <td>Edad</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Acá van las personas -->
-                    </tbody>
-                </table>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="jumbotron">
+            <h1 class="text-center">Telapong S.A.</h1>
+
+            <p class="text-center">Listado de clientes oficiales</p>
+
         </div>
     </div>
-    <!--
-    <div>
-        <ul>
-            <li class="negrita letra-grande">Opcion 1</li>
-            <li class="opcion-verde">Opcion 2</li>
-            <li class="opcion-roja">Opcion 3</li>
-        </ul>
+
+    <div class="row">
+        <input id="search" type="button" class="btn btn-primary" value="Buscar">
+        <br>
+        <br>
     </div>
-    <div id="boton">
-        <input type="button" value="Boton 1">
+
+    <div class="row">
+        <table id="tabla-clientes" class="table table-bordered table-striped">
+            <thead>
+            <td></td>
+            <td>ID</td>
+            <td>Razon Social</td>
+            <td>Direccion</td>
+            <td>Presidente</td>
+            <td>Patrimonio Neto</td>
+            <td>Inicio de act.</td>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
     </div>
-    <div>
-        <p class="negrita subrayado letra-grande">Este es un párrafo de prueba</p>
-    </div>
-    -->
+</div>
+
+
 </body>
 </html>
