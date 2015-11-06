@@ -7,38 +7,39 @@
     <script type="text/javascript" src="clientes.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-            var aux=10;
-            var aux1=0;
+            var aux = 10;
+            var aux1 = 0;
+            var aux3 = "";
             $("#search").click(function () {
 
-                for(var i=aux1;i<aux;i++) {
-                    $(clientes[i]).each(function (key, value) {
+                for (var i = aux1; i < aux; i++) {
+                    //$(clientes[i]).each(function (key, value) {
 
-                        if (value.activo - value.pasivo < 0) {
-                            var aux = "warning";
-                        } else {
-                            aux = "success"
-                        }
-                        $('#tabla-clientes>tbody').append(
-                                $("<tr>").append(
-                                        $("<td>").html("<img src='" + value.logo + "'>"),
-                                        $("<td>").text(value.id),
-                                        $("<td>").text(value.razonSocial),
-                                        $("<td>").text(value.direccion.calle + " " + value.direccion.altura + ", " + value.direccion.ciudad + ", " + value.direccion.pais),
-                                        $("<td>").text(value.presidente.nombre),
-                                        $("<td class='" + aux + "'>").text("$" + (value.activo - value.pasivo).toFixed(2)),
-                                        $("<td>").text(value.fechaCreacion)
-                                )
-                        )
+                    if (clientes[i].activo - clientes[i].pasivo < 0) {
+                        aux3 = "warning";
+                    } else {
+                        aux3 = "success"
+                    }
+                    $('#tabla-clientes>tbody').append(
+                            $("<tr>").append(
+                                    $("<td>").html("<img src='" + clientes[i].logo + "'>"),
+                                    $("<td>").text(clientes[i].id),
+                                    $("<td>").text(clientes[i].razonSocial),
+                                    $("<td>").text(clientes[i].direccion.calle + " " + clientes[i].direccion.altura + ", " + clientes[i].direccion.ciudad + ", " + clientes[i].direccion.pais),
+                                    $("<td>").text(clientes[i].presidente.nombre),
+                                    $("<td class='" + aux3 + "'>").text("$" + (clientes[i].activo - clientes[i].pasivo)),
+                                    $("<td>").text(clientes[i].fechaCreacion)
+                            )
+                    )
+                    if(i>=(clientes.length)-1){
+                        $("#search").attr("disabled", true);
+                        break;
 
+                    }
 
-                    });
                 }
-                aux=aux+10;
-                aux1=aux1+10;
-                if(aux1>35){
-                    $("#search").attr("disabled",true);
-                }
+                aux = aux + 10;
+                aux1 = aux1 + 10;
 
 
 
