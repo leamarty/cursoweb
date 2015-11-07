@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<title>La web del curso</title>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link type="text/css" rel="stylesheet" href="estilos.css"/>
+        <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css">
+		<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="clientes.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#boton-buscar').click(function() {
+                    var tablaClientesBody = $('#tabla-clientes').find('tbody');
+                    if (tablaClientesBody.find('tr').length == 1) {
+                        tablaClientesBody.html('');
+                    }
+                    var cantidadExistente = tablaClientesBody.find('tr').length;
+                    var i = cantidadExistente;
+                    while (i < clientes.length && (i - cantidadExistente) < 10) {
+                        var cliente = clientes[i];
+                        tablaClientesBody.append(
+                            $('<tr>').append(
+                                $('<td>').addClass('text-center').append(
+                                    $('<img>').attr('src', cliente.logo)
+                                ),
+                                $('<td>').text(cliente.id),
+                                $('<td>').text(cliente.razonSocial),
+                                $('<td>').text(cliente.direccion.calle + ' ' + cliente.direccion.altura + ', ' + cliente.direccion.ciudad),
+                                $('<td>').text(cliente.presidente.nombre + ' ' + cliente.presidente.apellido),
+                                $('<td>').addClass('text-right').addClass(cliente.activo >= cliente.pasivo ? 'success' : 'danger').text('$ ' + (cliente.activo - cliente.pasivo).toFixed(2)),
+                                $('<td>').text(cliente.fechaCreacion)
+                            )
+                        );
+                        i++;
+                    }
+                    if (tablaClientesBody.find('tr').length >= clientes.length) {
+                        $('#boton-buscar').attr('disabled', 'disabled');
+                    }
+                });
+            });
+        </script>
+	</head>
+	<body>
+        <div class="jumbotron text-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1>Telapong S.A.</h1>
+                        <p>Listado de clientes oficiales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-left">
+                    <button id="boton-buscar" class="btn btn-primary btn-lg">Buscar</button>
+                </div>
+            </div>
+            <div id="row-tabla" class="row">
+                <div class="col-md-12">
+                    <table id="tabla-clientes" class="table table-bordered table-striped table-hover">
+                        <thead class="text-center bold">
+                            <tr>
+                                <td></td>
+                                <td>ID</td>
+                                <td>Razón social</td>
+                                <td>Dirección</td>
+                                <td>Presidente</td>
+                                <td>Patrimonio neto</td>
+                                <td>Inicio de act.</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+	</body>
+</html>
