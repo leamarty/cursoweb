@@ -8,24 +8,20 @@
     <script type='text/javascript'>
         var ciclo = 0;
         $(document).ready(function () {
-            $('#boton').click(function() {
-                for(i=ciclo*10;i<ciclo*10+10;i++)
-                {
+            $('#boton').click(function () {
+                for (i = ciclo * 10; i < ciclo * 10 + 10; i++) {
                     var calculo = clientes[i].activo - clientes[i].pasivo;
                     var calculo_string;
-                    if(calculo < 0)
-                    {
+                    if (calculo < 0) {
                         calculo_string = '<td class="alert-danger">$ ' + calculo.toFixed(2) + '</td>';
                     }
-                    else
-                    {
+                    else {
                         calculo_string = '<td class="alert-success">$ ' + calculo.toFixed(2) + '</td>';
                     }
-                    if(clientes[i].ID != "")
-                    {
-                        $('#tabla-clientes tbody').append(
+                    if (clientes[i] != "") {
+                        $('table#tabla-clientes tbody').append(
                                 $('<tr>').append(
-                                        $('<td>').innerHTML = '<img src="'+clientes[i].logo+'">',
+                                        $('<td>').innerHTML = '<img src="' + clientes[i].logo + '">',
                                         $('<td>').text(clientes[i].id),
                                         $('<td>').text(clientes[i].razonSocial),
                                         $('<td>').text(clientes[i].direccion.calle + ' ' + clientes[i].direccion.altura + ', ' + clientes[i].direccion.ciudad),
@@ -48,14 +44,14 @@
 </div>
 <div class="container">
     <div class="row">
-
-        <div class="row">
-            <div class="col-lg-2">
-                <input type="button" value="Buscar" id="boton">
-            </div>
+        <div class="col-lg-2">
+            <input type="button" value="Buscar" id="boton">
         </div>
-        <table class="table table-bordered table-striped" id="tabla-clientes">
-            <thead>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table table-bordered table-striped" id="tabla-clientes">
+                <thead>
                 <tr>
                     <th></th>
                     <th>ID</th>
@@ -65,10 +61,11 @@
                     <th>Patrimonio neto</th>
                     <th>Inicio de act.</th>
                 </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 </body>
