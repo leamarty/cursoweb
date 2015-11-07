@@ -1,0 +1,19 @@
+{
+  "name": "modulo 2",
+  "version": "0.0.2",
+  "homepage": "https://github.com/leamarty/cursoweb",
+  "description": "Listado de clientes con AJAX",
+  "main": "index.html",
+  "keywords": [
+    "curso"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.5"
+  }
+}
