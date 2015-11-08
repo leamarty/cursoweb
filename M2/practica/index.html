@@ -1,105 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-		<title>La web del curso</title>
-		<meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link type="text/css" rel="stylesheet" href="estilos.css"/>
-        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-		<script src="bower_components/jquery/dist/jquery.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $.getJSON('clientes.php', {filtrame: 'caca'}, function(giles) {
-                    var tablaTemporal = $('<table>').addClass('table table-bordered').append(
-                        $('<tbody>')
-                    );
-                    $(giles).each(function(key, value) {
-                        $(tablaTemporal).find('tbody').append(
-                            $('<tr>').append(
-                                $('<td>').text(value.nombre),
-                                $('<td>').text(value.edad)
-                            )
-                        )
-                    });
-                    $('#los-giles').append(tablaTemporal);
+<head>
+    <title>La web del curso</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="text/css" rel="stylesheet" href="estilos.css"/>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
 
-                });
+            var tablas_cargadas = 0;
 
-                $('#boton-buscar').click(function() {
-                    var tablaClientesBody = $('#tabla-clientes').find('tbody');
-                    if (tablaClientesBody.find('tr').length == 1) {
-                        tablaClientesBody.html('');
-                    }
-                    var cantidadExistente = tablaClientesBody.find('tr').length;
-                    var i = cantidadExistente;
-                    while (i < clientes.length && (i - cantidadExistente) < 10) {
-                        var cliente = clientes[i];
-                        tablaClientesBody.append(
-                            $('<tr>').append(
-                                $('<td>').addClass('text-center').append(
-                                    $('<img>').attr('src', cliente.logo)
-                                ),
-                                $('<td>').text(cliente.id),
-                                $('<td>').text(cliente.razonSocial),
-                                $('<td>').text(cliente.direccion.calle + ' ' + cliente.direccion.altura + ', ' + cliente.direccion.ciudad),
-                                $('<td>').text(cliente.presidente.nombre + ' ' + cliente.presidente.apellido),
-                                $('<td>').addClass('text-right').addClass(cliente.activo >= cliente.pasivo ? 'success' : 'danger').text('$ ' + (cliente.activo - cliente.pasivo).toFixed(2)),
-                                $('<td>').text(cliente.fechaCreacion)
-                            )
+            function habilitar_boton() {
+                if (++tablas_cargadas == 2) {
+                    tablas_cargadas = 0;
+                    $("#boton-buscar").removeAttr("disabled");
+                }
+            }
+
+            $("#boton-buscar").click(function () {
+
+                $(this).attr("disabled", "");
+
+                $("div#div-alert").attr("class", "alert alert-info").text(" Comprobando disponibilidad del servidor. Por favor, espere.").prepend(
+                        $("<span>").addClass("glyphicon glyphicon-info-sign")
+                );
+
+                $.ajax({
+                    url: "http://ccvalsina.com/cursoweb/autorizacion.php",
+                    type: "GET",
+                    cache: false,
+                    error: function () {
+                        $("div#div-alert").attr("class", "alert alert-danger").text(" El servidor se encuentra ocupado. Por favor, espere un momento e intente nuevamente.").prepend(
+                                $("<span>").addClass("glyphicon glyphicon-remove")
                         );
-                        i++;
-                    }
-                    if (tablaClientesBody.find('tr').length >= clientes.length) {
-                        $('#boton-buscar').attr('disabled', 'disabled');
+                        $("#boton-buscar").removeAttr("disabled");
+                    },
+                    success: function () {
+                        $("div#div-alert").attr("class", "alert alert-success").text(" El servidor esta disponible para atender el pedido.").prepend(
+                                $("<span>").addClass("glyphicon glyphicon-ok")
+                        );
+                        $.getJSON(
+                                "clientes.php",
+                                {
+                                    desde: $("table#tabla-clientes-impares").children("tbody").children("tr").length * 2 + 1,
+                                    cantidad: 10,
+                                    filtro: "impar"
+                                },
+                                function (res) {
+                                    if (res.length == 0) {
+                                        $("div#div-alert").attr("class", "alert alert-warning").text(" No hay más clientes.").prepend(
+                                                $("<span>").addClass("glyphicon glyphicon-warning-sign")
+                                        );
+                                    } else {
+                                        var tabla_temporal = $("<tbody>");
+                                        $(res).each(function () {
+                                            $(tabla_temporal).prepend(
+                                                    $("<tr>").append(
+                                                            $("<td>").addClass("text-center").append(
+                                                                    $("<img>").attr("src", this.logo.replace("w=32", "w=36").replace("h=32", "h=36"))
+                                                            ),
+                                                            $("<td>").text(this.id),
+                                                            $("<td>").text(this.razonSocial),
+                                                            $("<td>").addClass("visible-lg").text(this.direccion.calle + " " + this.direccion.altura + ", " + this.direccion.ciudad),
+                                                            $("<td>").text(this.presidente.nombre + " " + this.presidente.apellido),
+                                                            $("<td>").addClass("text-right").addClass(this.activo >= this.pasivo ? "success" : "danger").text("$ " + (this.activo - this.pasivo).toFixed(2)),
+                                                            $("<td>").addClass("visible-lg").text(this.fechaCreacion)
+                                                    ).children("td").addClass("vcenter").parent()
+                                            )
+                                        });
+                                        $("table#tabla-clientes-impares").children("tbody").prepend($(tabla_temporal).html());
+                                        habilitar_boton();
+                                    }
+                                }
+                        );
+                        $.getJSON(
+                                "clientes.php",
+                                {
+                                    desde: $("table#tabla-clientes-pares").children("tbody").children("tr").length * 2 + 1,
+                                    cantidad: 10,
+                                    filtro: "par"
+                                },
+                                function (res) {
+                                    if (res.length == 0) {
+                                        $("div#div-alert").attr("class", "alert alert-warning").text(" No hay más clientes.").prepend(
+                                                $("<span>").addClass("glyphicon glyphicon-warning-sign")
+                                        );
+                                    } else {
+                                        var tabla_temporal = $("<tbody>");
+                                        $(res).each(function () {
+                                            $(tabla_temporal).prepend(
+                                                    $("<tr>").append(
+                                                            $("<td>").addClass("text-center").append(
+                                                                    $("<img>").attr("src", this.logo)
+                                                            ),
+                                                            $("<td>").text(this.id),
+                                                            $("<td>").text(this.razonSocial),
+                                                            $("<td>").addClass("visible-lg").text(this.direccion.calle + " " + this.direccion.altura + ", " + this.direccion.ciudad),
+                                                            $("<td>").text(this.presidente.nombre + " " + this.presidente.apellido),
+                                                            $("<td>").addClass("text-right").addClass(this.activo >= this.pasivo ? "success" : "danger").text("$ " + (this.activo - this.pasivo).toFixed(2)),
+                                                            $("<td>").addClass("visible-lg").text(this.fechaCreacion)
+                                                    ).children("td").addClass("vcenter").parent()
+                                            )
+                                        });
+
+                                        $("table#tabla-clientes-pares").children("tbody").prepend($(tabla_temporal).html());
+                                        habilitar_boton();
+                                    }
+                                }
+                        )
                     }
                 });
             });
-        </script>
-	</head>
-	<body>
-        <div class="jumbotron text-center">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h1>Telapong S.A.</h1>
-                        <p>Listado de clientes oficiales</p>
-                    </div>
-                </div>
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="jumbotron text-center">
+                <h1>Telapong S.A.</h1>
+                <p>Listado de clientes oficiales</p>
             </div>
         </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 text-left">
-                    <button id="boton-buscar" class="btn btn-primary btn-lg">Buscar</button>
-                </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <button class="btn btn-primary btn-lg" id="boton-buscar">
+                <span class="glyphicon glyphicon-search"></span> Buscar
+            </button>
+        </div>
+        <div class="col-sm-10">
+            <div class="alert alert-info" id="div-alert">
+                <span class="glyphicon glyphicon-info-sign"></span> Realize una búsqueda para cargar la lista de clientes.
             </div>
-            <div class="row">
-                <div id="los-giles" class="col-md-12">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <h2>Impares</h2>
+            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-impares">
+                <thead class="text-center">
+                <tr>
+                    <td></td>
+                    <td class="vcenter">ID</td>
+                    <td class="vcenter">Razón social</td>
+                    <td class="vcenter visible-lg">Dirección</td>
+                    <td class="vcenter">Presidente</td>
+                    <td class="vcenter">Patrimonio neto</td>
+                    <td class="vcenter visible-lg">Inicio de act.</td>
+                </tr>
+                </thead>
+                <tbody>
 
-                </div>
-            </div>
-            <div id="row-tabla" class="row">
-                <div class="col-md-12">
-                    <table id="tabla-clientes" class="table table-bordered table-striped table-hover">
-                        <thead class="text-center bold">
-                            <tr>
-                                <td></td>
-                                <td>ID</td>
-                                <td>Razón social</td>
-                                <td>Dirección</td>
-                                <td>Presidente</td>
-                                <td>Patrimonio neto</td>
-                                <td>Inicio de act.</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                </tbody>
+            </table>
         </div>
-	</body>
+        <div class="col-sm-6">
+            <h2>Pares</h2>
+            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-pares">
+                <thead class="text-center">
+                <tr>
+                    <td></td>
+                    <td class="vcenter">ID</td>
+                    <td class="vcenter">Razón social</td>
+                    <td class="vcenter visible-lg">Dirección</td>
+                    <td class="vcenter">Presidente</td>
+                    <td class="vcenter">Patrimonio neto</td>
+                    <td class="vcenter visible-lg">Inicio de act.</td>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
 </html>
