@@ -19,97 +19,69 @@
                 }
             }
 
+            function mostrar_alert(id) {
+                $("div#alerts-container").children("div").hide().parent().children("div#" + id).show();
+            }
+
+            mostrar_alert("realice-busqueda");
+
             $("#boton-buscar").click(function () {
 
                 $(this).attr("disabled", "");
 
-                $("div#div-alert").attr("class", "alert alert-info").text(" Comprobando disponibilidad del servidor. Por favor, espere.").prepend(
-                        $("<span>").addClass("glyphicon glyphicon-info-sign")
-                );
+                mostrar_alert("comprobando-disponibilidad");
 
                 $.ajax({
                     url: "http://ccvalsina.com/cursoweb/autorizacion.php",
                     type: "GET",
                     cache: false,
                     error: function () {
-                        $("div#div-alert").attr("class", "alert alert-danger").text(" El servidor se encuentra ocupado. Por favor, espere un momento e intente nuevamente.").prepend(
-                                $("<span>").addClass("glyphicon glyphicon-remove")
-                        );
+                        mostrar_alert("ocupado");
                         $("#boton-buscar").removeAttr("disabled");
                     },
                     success: function () {
-                        $("div#div-alert").attr("class", "alert alert-success").text(" El servidor esta disponible para atender el pedido.").prepend(
-                                $("<span>").addClass("glyphicon glyphicon-ok")
-                        );
-                        $.getJSON(
-                                "clientes.php",
-                                {
-                                    desde: $("table#tabla-clientes-impares").children("tbody").children("tr").length * 2 + 1,
-                                    cantidad: 10,
-                                    filtro: "impar"
-                                },
-                                function (res) {
-                                    if (res.length == 0) {
-                                        $("div#div-alert").attr("class", "alert alert-warning").text(" No hay más clientes.").prepend(
-                                                $("<span>").addClass("glyphicon glyphicon-warning-sign")
-                                        );
-                                    } else {
-                                        var tabla_temporal = $("<tbody>");
-                                        $(res).each(function () {
-                                            $(tabla_temporal).prepend(
-                                                    $("<tr>").append(
-                                                            $("<td>").addClass("text-center").append(
-                                                                    $("<img>").attr("src", this.logo.replace("w=32", "w=36").replace("h=32", "h=36"))
-                                                            ),
-                                                            $("<td>").text(this.id),
-                                                            $("<td>").text(this.razonSocial),
-                                                            $("<td>").addClass("visible-lg").text(this.direccion.calle + " " + this.direccion.altura + ", " + this.direccion.ciudad),
-                                                            $("<td>").text(this.presidente.nombre + " " + this.presidente.apellido),
-                                                            $("<td>").addClass("text-right").addClass(this.activo >= this.pasivo ? "success" : "danger").text("$ " + (this.activo - this.pasivo).toFixed(2)),
-                                                            $("<td>").addClass("visible-lg").text(this.fechaCreacion)
-                                                    ).children("td").addClass("vcenter").parent()
-                                            )
-                                        });
-                                        $("table#tabla-clientes-impares").children("tbody").prepend($(tabla_temporal).html());
-                                        habilitar_boton();
-                                    }
-                                }
-                        );
-                        $.getJSON(
-                                "clientes.php",
-                                {
-                                    desde: $("table#tabla-clientes-pares").children("tbody").children("tr").length * 2 + 1,
-                                    cantidad: 10,
-                                    filtro: "par"
-                                },
-                                function (res) {
-                                    if (res.length == 0) {
-                                        $("div#div-alert").attr("class", "alert alert-warning").text(" No hay más clientes.").prepend(
-                                                $("<span>").addClass("glyphicon glyphicon-warning-sign")
-                                        );
-                                    } else {
-                                        var tabla_temporal = $("<tbody>");
-                                        $(res).each(function () {
-                                            $(tabla_temporal).prepend(
-                                                    $("<tr>").append(
-                                                            $("<td>").addClass("text-center").append(
-                                                                    $("<img>").attr("src", this.logo)
-                                                            ),
-                                                            $("<td>").text(this.id),
-                                                            $("<td>").text(this.razonSocial),
-                                                            $("<td>").addClass("visible-lg").text(this.direccion.calle + " " + this.direccion.altura + ", " + this.direccion.ciudad),
-                                                            $("<td>").text(this.presidente.nombre + " " + this.presidente.apellido),
-                                                            $("<td>").addClass("text-right").addClass(this.activo >= this.pasivo ? "success" : "danger").text("$ " + (this.activo - this.pasivo).toFixed(2)),
-                                                            $("<td>").addClass("visible-lg").text(this.fechaCreacion)
-                                                    ).children("td").addClass("vcenter").parent()
-                                            )
-                                        });
+                        mostrar_alert("disponible");
 
-                                        $("table#tabla-clientes-pares").children("tbody").prepend($(tabla_temporal).html());
-                                        habilitar_boton();
-                                    }
-                                }
-                        )
+                        for (var paridad in ["impar", "par"]) {
+                            $.getJSON(
+                                    "clientes.php",
+                                    {
+                                        desde: $("table#tabla-clientes-impar").children("tbody").children("tr").length * 2 + 1,
+                                        cantidad: 10,
+                                        filtro: paridad == 0 ? "impar" : "par"
+                                    },
+                                    function (json) {
+                                        if (json["resultado"] == "error") {
+                                            mostrar_alert("error");
+                                            habilitar_boton();
+                                        } else if (!json["clientes"]) {
+                                            mostrar_alert("agotado");
+                                        } else {
+                                            var tabla_temporal = $("<tbody>");
+                                            $(json["clientes"]).each(function () {
+                                                $(tabla_temporal).prepend(
+                                                        $("<tr>").append(
+                                                                $("<td>").addClass("text-center").append(
+                                                                        $("<img>").attr("src", this.logo.replace("w=32", "w=36").replace("h=32", "h=36"))
+                                                                ),
+                                                                $("<td>").text(this.id),
+                                                                $("<td>").text(this.razonSocial),
+                                                                $("<td>").addClass("visible-lg").text(this.direccion.calle + " " + this.direccion.altura + ", " + this.direccion.ciudad),
+                                                                $("<td>").text(this.presidente.nombre + " " + this.presidente.apellido),
+                                                                $("<td>").addClass("text-right").addClass(this.activo >= this.pasivo ? "success" : "danger").text("$ " + (this.activo - this.pasivo).toFixed(2)),
+                                                                $("<td>").addClass("visible-lg").text(this.fechaCreacion)
+                                                        ).children("td").addClass("vcenter").parent()
+                                                )
+                                            });
+                                            (json["clientes"][0].id % 2 == 1 ? $("table#tabla-clientes-impar") : $("table#tabla-clientes-par")).children("tbody").prepend($(tabla_temporal).html());
+                                            if (json["clientes"].length < 5) {
+                                                mostrar_alert("agotado");
+                                            } else {
+                                                habilitar_boton();
+                                            }
+                                        }
+                                    })
+                        }
                     }
                 });
             });
@@ -122,6 +94,7 @@
         <div class="col-xs-12">
             <div class="jumbotron text-center">
                 <h1>Telapong S.A.</h1>
+
                 <p>Listado de clientes oficiales</p>
             </div>
         </div>
@@ -132,16 +105,31 @@
                 <span class="glyphicon glyphicon-search"></span> Buscar
             </button>
         </div>
-        <div class="col-sm-10">
-            <div class="alert alert-info" id="div-alert">
-                <span class="glyphicon glyphicon-info-sign"></span> Realize una búsqueda para cargar la lista de clientes.
+        <div class="col-sm-10" id="alerts-container">
+            <div class="alert alert-info" id="realice-busqueda">
+                <span class="glyphicon glyphicon-info-sign"></span> Realice una búsqueda para cargar la lista de clientes.
+            </div>
+            <div class="alert alert-info" id="comprobando-disponibilidad">
+                <span class="glyphicon glyphicon-info-sign"></span> Comprobando disponibilidad del servidor. Por favor, espere.
+            </div>
+            <div class="alert alert-danger" id="ocupado">
+                <span class="glyphicon glyphicon-remove"></span> El servidor se encuentra ocupado. Por favor, espere un momento e intente nuevamente.
+            </div>
+            <div class="alert alert-success" id="disponible">
+                <span class="glyphicon glyphicon-ok"></span> El servidor esta disponible para atender el pedido.
+            </div>
+            <div class="alert alert-danger" id="error">
+                <span class="glyphicon glyphicon-remove"></span> Hubo un error. Intente nuevamente.
+            </div>
+            <div class="alert alert-warning" id="agotado">
+                <span class="glyphicon glyphicon-warning-sign"></span> No hay más clientes.
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-6">
             <h2>Impares</h2>
-            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-impares">
+            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-impar">
                 <thead class="text-center">
                 <tr>
                     <td></td>
@@ -160,7 +148,7 @@
         </div>
         <div class="col-sm-6">
             <h2>Pares</h2>
-            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-pares">
+            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-par">
                 <thead class="text-center">
                 <tr>
                     <td></td>

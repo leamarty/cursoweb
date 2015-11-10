@@ -7,7 +7,7 @@ $clientes = json_decode($json, true);
 // falta comprobar que sean numeros
 if (!(isset($_GET["filtro"]) && isset($_GET["desde"]) && isset($_GET["cantidad"])) ||
     ($_GET["filtro"] != "impar" && $_GET["filtro"] != "par") ||
-    $_GET["desde"] < 1 || $_GET["desde"] > count($clientes)
+    $_GET["desde"] < 1 /* || $_GET["desde"] > count($clientes) */
 ) {
     $res = array(
         "resultado" => "error"
