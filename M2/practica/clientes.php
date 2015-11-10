@@ -4,31 +4,29 @@ $json = file_get_contents("clientes.json");
 
 $clientes = json_decode($json, true);
 
-if (! (isset($_GET["filtro"]) && isset($_GET["desde"]) && isset($_GET["cantidad"]))) {
-    exit();
+// falta comprobar que sean numeros
+if (!(isset($_GET["filtro"]) && isset($_GET["desde"]) && isset($_GET["cantidad"])) ||
+    ($_GET["filtro"] != "impar" && $_GET["filtro"] != "par") ||
+    $_GET["desde"] < 1 || $_GET["desde"] > count($clientes)
+) {
+    $res = array(
+        "resultado" => "error"
+    );
+    exit(json_encode($res));
 }
 
-$r = "[";
+$res = array(
+    "resultado" => "success"
+);
 
-$i = $_GET["desde"];
-if ($_GET["filtro"] == "impar" && !($i & 1)) {
-    $i++;
-} elseif ($_GET["filtro"] == "par" && $i & 1) {
-    $i++;
+for ($i = $_GET["desde"]; $i - $_GET["desde"] < $_GET["cantidad"] && $i - 1 < count($clientes); $i++) {
+    if ($i % 2 == ($_GET["filtro"] == "impar" ? 1 : 0)) {
+        $res["clientes"][] = $clientes[$i - 1];
+    }
 }
-
-for (; $i - $_GET["desde"] < 10 && $i - 1 < count($clientes); $i += 2) {
-    $r .= json_encode($clientes[$i - 1]) . ",";
-}
-
-if (substr($r, -1, 1) == ",") {
-    $r = substr($r, 0, -1);
-}
-
-$r .= "]";
 
 if ($_GET["filtro"] == "impar") {
     sleep(3);
 }
 
-echo $r;
+echo json_encode($res);
