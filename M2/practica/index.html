@@ -24,33 +24,6 @@
              $('#los-giles').append(tablaTemporal);
 
              });*/
-            var ini = 0;
-            var cant = 10;
-            var responseS = 0;
-
-            function finished() {
-                if (++responseS === 2) {
-                    //$('#boton-buscar').attr("disabled", false);
-                    //responseS=0;
-                    if (cant < 30) {
-                        cant = cant + 10;
-                        ini = ini + 10;
-                        $('#boton-buscar').attr("disabled", false);
-                        responseS = 0;
-                    } else {
-                        if (cant < 35) {
-                            cant = cant + 5;
-                            ini = ini + 10;
-                            $('#boton-buscar').attr("disabled", false);
-                            responseS = 0;
-                        }else{
-                            $('div#mensaje-alerta').attr("class", "alert alert-info").text("No hay mas clientes!!!.");
-                        }
-                    }
-
-
-                }
-            }
 
             $('#boton-buscar').click(function () {
                 $(this).attr("disabled", true);
@@ -60,43 +33,20 @@
                     success: function () {
                         $('div#mensaje-alerta').attr("class", "alert alert-info").text("El servidor esta disponible para atender el pedido.");
 
-                        $.getJSON('clientes.php', {cond: 'p', can: cant, in: ini}, function (rta) {
-                            var tablaParesBody = $('table#tabla-pares').find('tbody');
-                            if (tablaParesBody.find('tr').length == 1) {
-                                tablaParesBody.html('');
-                            }
-                            $.each(rta, function (k) {
-
+                        $.getJSON('clientes.php', function (rta) {
+                            //$().each(function()
+                            //{
                                 $('table#tabla-pares').append(
                                         $('<tr>').append(
-                                                $('<td>').text(rta[k]['logo']),
-                                                $('<td>').text(rta[k]['id']),
-                                                $('<td>').text(rta[k]['razs']),
-                                                $('<td>').text(rta[k]['pres'].nombre + ' ' + rta[k]['pres'].apellido),
-                                                $('<td>').text(rta[k]['patri'])
+                                                $('<td>').text(rta['logo']),
+                                                $('<td>').text(rta['id']),
+                                                $('<td>').text(rta['razs']),
+                                                $('<td>').text(rta['pres'].nombre + ' ' + rta['pres'].apellido),
+                                                $('<td>').text(rta['patri'])
                                         )
                                 )
-                            });
-                            finished();
-                        });
-                        $.getJSON('clientes.php', {cond: 'i', can: cant, in: ini}, function (rta) {
-                            var tablaImparesBody = $('table#tabla-impares').find('tbody');
-                            if (tablaImparesBody.find('tr').length == 1) {
-                                tablaImparesBody.html('');
-                            }
-                            $.each(rta, function (k) {
+                            //});
 
-                                $('table#tabla-impares').append(
-                                        $('<tr>').append(
-                                                $('<td>').text(rta[k]['logo']),
-                                                $('<td>').text(rta[k]['id']),
-                                                $('<td>').text(rta[k]['razs']),
-                                                $('<td>').text(rta[k]['pres'].nombre + ' ' + rta[k]['pres'].apellido),
-                                                $('<td>').text(rta[k]['patri'])
-                                        )
-                                )
-                            });
-                            finished();
                         });
 
                     },
