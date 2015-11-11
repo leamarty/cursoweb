@@ -9,76 +9,36 @@
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
-            /*$.getJSON('clientes.php', {filtrame: 'caca'}, function (giles) {
-             var tablaTemporal = $('<table>').addClass('table table-bordered').append(
-             $('<tbody>')
-             );
-             $(giles).each(function (key, value) {
-             $(tablaTemporal).find('tbody').append(
-             $('<tr>').append(
-             $('<td>').text(value.nombre),
-             $('<td>').text(value.edad)
-             )
-             )
-             });
-             $('#los-giles').append(tablaTemporal);
+            $.getJSON('clientes.php', {filtrame: 'caca'}, function (giles) {
+                var tablaTemporal = $('<table>').addClass('table table-bordered').append(
+                        $('<tbody>')
+                );
+                $(giles).each(function (key, value) {
+                    $(tablaTemporal).find('tbody').append(
+                            $('<tr>').append(
+                                    $('<td>').text(value.nombre),
+                                    $('<td>').text(value.edad)
+                            )
+                    )
+                });
+                $('#los-giles').append(tablaTemporal);
 
-             });*/
+            });
 
             $('#boton-buscar').click(function () {
                 $(this).attr("disabled", true);
                 $.ajax({
-                    type: "GET",
-                    url: "http://ccvalsina.com/cursoweb/autorizacion.php",
-                    success: function () {
-                        $('div#mensaje-alerta').attr("class", "alert alert-info").text("El servidor esta disponible para atender el pedido.");
+                    type:"GET",
+                    url:"http://ccvalsina.com/cursoweb/autorizacion.php",
+                    success: function(){
+                    $('div#mensaje-alerta').attr("class", "alert alert-info").text("El servidor esta disponible para atender el pedido.");
+                },
+                    error: function(){
+                    $('div#mensaje-alerta').attr("class", "alert alert-danger").text("El servidor se encuentra ocupado. Por favor aguarde e intente nuevamente.");
+                    $('#boton-buscar').attr("disabled",false);
+                }
 
-
-                        $.getJSON('clientes.php',
-                                {
-                                    cant: 5,
-                                    cond: "par"
-                                },
-                                function (datospares) {
-                                    $('table#tabla-pares>tbody').append(
-                                            $('<tr>').append(
-                                                    $('<td>').html("<img src='" + datospares.logo + "'>"),
-                                                    $('<td>').text(datospares.id),
-                                                    $('<td>').text(datospares.razonSocial),
-                                                    $('<td>').text(datospares.presidente.nombre
-                                                    ),
-                                                    $('<td>').text(1)
-                                            )
-                                    )
-
-                                });
-
-                        $.getJSON('clientes.php',
-                                {
-                                    cant: 5,
-                                    cond: "impar"
-                                },
-                                function (datosimpares) {
-                                    $('table#tabla-impares>tbody').append(
-                                            $('<tr>').append(
-                                                    $('<td>').html("<img src= '" + datosimpares.logo + "'>"),
-                                                    $('<td>').text(datosimpares.id),
-                                                    $('<td>').text(datosimpares.razonSocial),
-                                                    $('<td>').text(datosimpares.presidente.nombre),
-                                                    $('<td>').text(1)
-                                            )
-                                    )
-
-                                });
-
-
-                    },
-                    error: function () {
-                        $('div#mensaje-alerta').attr("class", "alert alert-danger").text("El servidor se encuentra ocupado. Por favor aguarde e intente nuevamente.");
-                        $('#boton-buscar').attr("disabled", false);
-                    }
-
-                });
+                        });
 
 
                 /*var tablaClientesBody = $('#tabla-clientes').find('tbody');
