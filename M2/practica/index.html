@@ -20,15 +20,54 @@
             }
 
             function mostrar_alert(id) {
-                $("div#alerts-container").children("div").hide().parent().children("div#" + id).show();
+                $("div#alerts-container").children("div:not(#" + id + ")").hide().parent().children("div#" + id).show();
             }
 
             mostrar_alert("realice-busqueda");
 
+            function pedir_clientes(paridad) {
+
+                $.getJSON(
+                        "clientes.php",
+                        {
+                            desde: $("table#tabla-clientes-impar").children("tbody").children("tr").length * 2 + 1,
+                            cantidad: 10,
+                            filtro: paridad
+
+                        }).fail(function () {
+                            mostrar_alert("error");
+                            habilitar_boton();
+
+                        }).done(function (json) {
+                            var tabla_temporal = $("<tbody>");
+                            $(json).each(function () {
+                                $(tabla_temporal).prepend(
+                                        $("<tr>").append(
+                                                $("<td>").addClass("text-center").append(
+                                                        $("<img>").attr("src", this.logo.replace("w=32", "w=36").replace("h=32", "h=36"))
+                                                ),
+                                                $("<td>").text(this.id),
+                                                $("<td>").text(this.razonSocial),
+                                                $("<td>").addClass("visible-lg").text(this.direccion.calle + " " + this.direccion.altura + ", " + this.direccion.ciudad),
+                                                $("<td>").text(this.presidente.nombre + " " + this.presidente.apellido),
+                                                $("<td>").addClass("text-right").addClass(this.activo >= this.pasivo ? "success" : "danger").text("$ " + (this.activo - this.pasivo).toFixed(2)),
+                                                $("<td>").addClass("visible-lg").text(this.fechaCreacion)
+                                        ).children("td").addClass("vcenter").parent()
+                                )
+                            });
+                            $("table#tabla-clientes-" + paridad).children("tbody").prepend($(tabla_temporal).html());
+
+                            if (json.length < 5) {
+                                mostrar_alert("agotado");
+                            } else {
+                                habilitar_boton();
+                            }
+                        });
+            }
+
             $("#boton-buscar").click(function () {
 
                 $(this).attr("disabled", "");
-
                 mostrar_alert("comprobando-disponibilidad");
 
                 $.ajax({
@@ -41,46 +80,8 @@
                     },
                     success: function () {
                         mostrar_alert("disponible");
-
-                        for (var paridad in ["impar", "par"]) {
-                            $.getJSON(
-                                    "clientes.php",
-                                    {
-                                        desde: $("table#tabla-clientes-impar").children("tbody").children("tr").length * 2 + 1,
-                                        cantidad: 10,
-                                        filtro: paridad == 0 ? "impar" : "par"
-                                    },
-                                    function (json) {
-                                        if (json["resultado"] == "error") {
-                                            mostrar_alert("error");
-                                            habilitar_boton();
-                                        } else if (!json["clientes"]) {
-                                            mostrar_alert("agotado");
-                                        } else {
-                                            var tabla_temporal = $("<tbody>");
-                                            $(json["clientes"]).each(function () {
-                                                $(tabla_temporal).prepend(
-                                                        $("<tr>").append(
-                                                                $("<td>").addClass("text-center").append(
-                                                                        $("<img>").attr("src", this.logo.replace("w=32", "w=36").replace("h=32", "h=36"))
-                                                                ),
-                                                                $("<td>").text(this.id),
-                                                                $("<td>").text(this.razonSocial),
-                                                                $("<td>").addClass("visible-lg").text(this.direccion.calle + " " + this.direccion.altura + ", " + this.direccion.ciudad),
-                                                                $("<td>").text(this.presidente.nombre + " " + this.presidente.apellido),
-                                                                $("<td>").addClass("text-right").addClass(this.activo >= this.pasivo ? "success" : "danger").text("$ " + (this.activo - this.pasivo).toFixed(2)),
-                                                                $("<td>").addClass("visible-lg").text(this.fechaCreacion)
-                                                        ).children("td").addClass("vcenter").parent()
-                                                )
-                                            });
-                                            (json["clientes"][0].id % 2 == 1 ? $("table#tabla-clientes-impar") : $("table#tabla-clientes-par")).children("tbody").prepend($(tabla_temporal).html());
-                                            if (json["clientes"].length < 5) {
-                                                mostrar_alert("agotado");
-                                            } else {
-                                                habilitar_boton();
-                                            }
-                                        }
-                                    })
+                        for (var paridad in {"impar": "", "par": ""}) {
+                            pedir_clientes(paridad);
                         }
                     }
                 });
