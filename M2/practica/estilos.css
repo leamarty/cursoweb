@@ -1,6 +1,14 @@
-#row-tabla {
-	padding-top: 20px;
+/* si se deja solo vcenter, entonces no funciona porque lo sobreescribe bootstrap */
+.table .vcenter {
+    vertical-align: middle;
 }
-.bold {
-	font-weight: bold;
+
+#boton-buscar {
+    /* padding agranda el boton en si y no el espacio que hay debajo */
+    /* no probe con border */
+    /* margin-bottom: 25px; */
+}
+
+table > thead > tr > td {
+    font-weight: bold;
 }
