@@ -1,3 +1,13 @@
 .bold {
     font-weight: bold;
 }
+
+/* si se deja solo vcenter, entonces no funciona porque lo sobreescribe bootstrap */
+/* sera por el orden en el que importamos los css en <head> ? */
+.table .vcenter {
+    vertical-align: middle;
+}
+
+.table .nopadding {
+    padding: 0px;
+}

@@ -17,7 +17,7 @@
     </script>
 </head>
 <body>
-<div class="container" ng-app="clientesProviderApp" ng-controller="ClientesListCtrl" ng-init="desde=1;cantidad=10;clientes=[]">
+<div class="container" data-ng-app="clientesProviderApp" data-ng-controller="ClientesListCtrl" data-ng-init="clientes=[]">
     <div class="row">
         <div class="col-xs-12">
             <div class="jumbotron text-center">
@@ -29,7 +29,7 @@
     </div>
     <div class="row">
         <div class="col-sm-2">
-            <button class="btn btn-primary btn-lg" ng-click="pedirClientes()">Buscar</button>
+            <button class="btn btn-primary btn-lg" data-ng-click="pedirClientes()">Buscar</button>
         </div>
         <div class="col-sm-10">
 
@@ -49,14 +49,14 @@
                 </tr>
                 </thead>
                 <tbody id="tbody-impar">
-                <tr ng-repeat="x in clientes | impar">
-                    <td class="vcenter text-center">
-                        <img src="{{x.logo}}" alt="logo">
+                <tr data-ng-repeat="x in clientes | filtrarParidad: 'impar' | orderBy: '-id'">
+                    <td class="vcenter text-center nopadding">
+                        <img src="{{ x.logo.replace('w=32', 'w=36').replace('h=32', 'h=36') }}" alt="logo">
                     </td>
-                    <td class="vcenter">{{x.id}}</td>
-                    <td class="vcenter">{{x.razonSocial}}</td>
-                    <td class="vcenter">{{x.presidente.nombre + " " + x.presidente.apellido}}</td>
-                    <td class="vcenter text-right{{ x.activo >= x.pasivo ? ' success' : ' danger'}}">{{ (x.activo - x.pasivo).toFixed(2) }}</td>
+                    <td class="vcenter text-center">{{ x.id }}</td>
+                    <td class="vcenter">{{ x.razonSocial }}</td>
+                    <td class="vcenter">{{ x.presidente.nombre + " " + x.presidente.apellido }}</td>
+                    <td class="vcenter text-right{{ x.activo >= x.pasivo ? ' success' : ' danger'}}">$ {{ (x.activo - x.pasivo).toFixed(2) }}</td>
                 </tr>
                 </tbody>
             </table>
@@ -67,21 +67,21 @@
                 <thead class="text-center bold">
                 <tr>
                     <td></td>
-                    <td class="vcenter">ID</td>
+                    <td class="vcenter text-center nopadding">ID</td>
                     <td class="vcenter">Razón social</td>
                     <td class="vcenter">Presidente</td>
                     <td class="vcenter">Patrimonio neto</td>
                 </tr>
                 </thead>
                 <tbody id="tbody-par">
-                <tr ng-repeat="x in clientes | par">
-                    <td class="vcenter text-center">
-                        <img src="{{x.logo}}" alt="logo">
+                <tr data-ng-repeat="x in clientes | filtrarParidad: 'par' | orderBy: '-id'">
+                    <td class="vcenter text-center nopadding">
+                        <img src="{{ x.logo.replace('w=32', 'w=36').replace('h=32', 'h=36') }}" alt="logo">
                     </td>
-                    <td class="vcenter">{{x.id}}</td>
-                    <td class="vcenter">{{x.razonSocial}}</td>
-                    <td class="vcenter">{{x.presidente.nombre + " " + x.presidente.apellido}}</td>
-                    <td class="vcenter text-right{{ x.activo >= x.pasivo ? ' success' : ' danger'}}">{{ (x.activo - x.pasivo).toFixed(2) }}</td>
+                    <td class="vcenter" text-center>{{ x.id }}</td>
+                    <td class="vcenter">{{ x.razonSocial }}</td>
+                    <td class="vcenter">{{ x.presidente.nombre + " " + x.presidente.apellido }}</td>
+                    <td class="vcenter text-right{{ x.activo >= x.pasivo ? ' success' : ' danger'}}">$ {{ (x.activo - x.pasivo).toFixed(2) }}</td>
                 </tr>
                 </tbody>
             </table>
