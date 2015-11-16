@@ -1,8 +1,5 @@
 <?php
 
-$json = file_get_contents ('clientes.json');
-$clientes = json_decode ($json, true);
-
 if (! (isset ($_GET ['filtro']) && isset ($_GET ['desde']) && isset ($_GET ['cantidad']))) {
     if (isset ($_GET ['filtro']) && $_GET ['filtro'] == 'impar') {
         sleep (3);
@@ -16,13 +13,21 @@ $desde = $_GET ['desde'];
 $cantidad = $_GET ['cantidad'];
 
 if (! in_array ($filtro, array ('impar', 'par')) ||
-    ! is_numeric ($desde) || $desde < 1 /* || $desde > count($clientes) */ ||
-    ! is_numeric ($cantidad) || $cantidad < 0 || $cantidad > count($clientes)
+    ! is_numeric ($desde) || $desde < 1 ||
+    ! is_numeric ($cantidad) || $cantidad < 0
 ) {
     if ($filtro == 'impar') {
         sleep (3);
     }
     header ('HTTP/1.1 401 Unauthorized');
+    exit();
+}
+
+if ($cantidad == 0) {
+    if ($filtro == 'impar') {
+        sleep (3);
+    }
+    echo '[]';
     exit();
 }
 
@@ -34,6 +39,23 @@ if ($db -> connect_error) {
     header ('HTTP/1.1 500 Internal Server Error');
     exit();
 }
+
+/*
+$query = 'SELECT COUNT(id) FROM clientes;';
+$resultado = $db -> query ($query);
+if ($db -> error) {
+    if ($filtro == 'impar') {
+        sleep (3);
+    }
+    $db -> close();
+    header ('HTTP/1.1 500 Internal Server Error');
+    exit();
+}
+
+if ($cantidad > $resultado -> fetch_assoc() ['COUNT(id)']) {
+
+}
+*/
 
 $paridad = $filtro == 'impar' ? 1 : 0;
 $query = "SELECT
@@ -54,6 +76,7 @@ if ($db -> error && $db -> errno != 1051) {
     if ($filtro == 'impar') {
         sleep (3);
     }
+    $db -> close();
     header ('HTTP/1.1 500 Internal Server Error');
     exit();
 }
