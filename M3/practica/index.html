@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>La web del curso</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="text/css" rel="stylesheet" href="estilos.css"/>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+
+            var tablas_cargadas = 0;
+
+            function habilitar_boton() {
+                if (++tablas_cargadas == 2) {
+                    tablas_cargadas = 0;
+                    $("#boton-buscar").removeAttr("disabled");
+                }
+            }
+
+            function mostrar_alert(id) {
+                $("div#alerts-container").children("div:not(#" + id + ")").hide().parent().children("div#" + id).show();
+            }
+
+            mostrar_alert("realice-busqueda");
+
+            function pedir_clientes(paridad) {
+
+                $.getJSON(
+                        "clientes.php",
+                        {
+                            desde: $("table#tabla-clientes-impar").children("tbody").children("tr").length * 2 + 1,
+                            cantidad: 5,
+                            filtro: paridad
+
+                        }).fail(function () {
+                            mostrar_alert("error");
+                            habilitar_boton();
+
+                        }).done(function (json) {
+                            var tabla_temporal = $("<tbody>");
+                            $(json).each(function () {
+                                $(tabla_temporal).prepend(
+                                        $("<tr>").append(
+                                                $("<td>").addClass("text-center").append(
+                                                        $("<img>").attr("src", this.logo.replace("w=32", "w=36").replace("h=32", "h=36"))
+                                                ),
+                                                $("<td>").addClass("text-center").text(this.id),
+                                                $("<td>").text(this.razonSocial),
+                                                $("<td>").addClass("visible-lg").text(this.direccion.calle + " " + this.direccion.altura + ", " + this.direccion.ciudad),
+                                                $("<td>").text(this.presidente.nombre + " " + this.presidente.apellido),
+                                                $("<td>").addClass("text-right").addClass(this.activo >= this.pasivo ? "success" : "danger").text("$ " + (this.activo - this.pasivo).toFixed(2)),
+                                                // $("<td>").addClass("visible-lg").text(this.fechaCreacion)
+                                                $("<td>").addClass("text-center").append(
+                                                        $("<button>").addClass("btn btn-danger boton-borrar").append(
+                                                                $("<span>").addClass("glyphicon glyphicon-remove")
+                                                        )
+                                                )
+                                        ).children("td").addClass("vcenter").parent()
+                                )
+                            });
+                            $("table#tabla-clientes-" + paridad).children("tbody").prepend($(tabla_temporal).html());
+                            bindear_botones_borrar();
+
+                            /* if (json.length < 5) {
+                                mostrar_alert("agotado");
+                            } else { */
+                                habilitar_boton();
+                            /* } */
+                        });
+            }
+
+            $("#boton-buscar").click(function () {
+
+                $(this).attr("disabled", "");
+                mostrar_alert("comprobando-disponibilidad");
+
+                $.ajax({
+                    url: "http://ccvalsina.com/cursoweb/autorizacion.php",
+                    type: "GET",
+                    cache: false,
+
+                    error: function () {
+                        mostrar_alert("ocupado");
+                        $("#boton-buscar").removeAttr("disabled");
+                        // borrar el siguiente for cuando vuelva internet y descomentar la linea de arriba
+                        /* for (var paridad in {"impar": "", "par": ""}) {
+                            pedir_clientes(paridad);
+                        } */
+                    },
+
+                    success: function () {
+                        mostrar_alert("disponible");
+                        for (var paridad in {"impar": "", "par": ""}) {
+                            pedir_clientes(paridad);
+                        }
+                    }
+                });
+            });
+
+            function borrar_cliente (ele) {
+
+                $.ajax({
+                    url: "clientes.php",
+                    type: "DELETE",
+                    data: {
+                        id: $(ele).parents("tr").children("td")[1].textContent
+                    },
+
+                    error: function () {
+                        mostrar_alert("error");
+                        $(ele).removeAttr("disabled");
+                    },
+
+                    success: function () {
+                        $(ele).parents("tr").remove();
+                    }
+                });
+            }
+
+            function bindear_botones_borrar() {
+                $("button.boton-borrar").off("click").on("click", function () {
+
+                    $(this).attr("disabled", "");
+                    borrar_cliente(this);
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="jumbotron text-center">
+                <h1>Telapong S.A.</h1>
+                <p>Listado de clientes oficiales</p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            <button class="btn btn-primary btn-lg" id="boton-buscar">
+                <span class="glyphicon glyphicon-search"></span> Buscar
+            </button>
+        </div>
+        <div class="col-sm-10" id="alerts-container">
+            <div class="alert alert-info" id="realice-busqueda">
+                <span class="glyphicon glyphicon-info-sign"></span> Realice una búsqueda para cargar la lista de clientes.
+            </div>
+            <div class="alert alert-info" id="comprobando-disponibilidad">
+                <span class="glyphicon glyphicon-info-sign"></span> Comprobando disponibilidad del servidor. Por favor, espere.
+            </div>
+            <div class="alert alert-danger" id="ocupado">
+                <span class="glyphicon glyphicon-remove"></span> El servidor se encuentra ocupado. Por favor, espere un momento e intente nuevamente.
+            </div>
+            <div class="alert alert-success" id="disponible">
+                <span class="glyphicon glyphicon-ok"></span> El servidor esta disponible para atender el pedido.
+            </div>
+            <div class="alert alert-danger" id="error">
+                <span class="glyphicon glyphicon-remove"></span> Hubo un error. Intente nuevamente.
+            </div>
+            <div class="alert alert-warning" id="agotado">
+                <span class="glyphicon glyphicon-warning-sign"></span> No hay más clientes.
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <h2>Impares</h2>
+            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-impar">
+                <thead class="text-center">
+                <tr>
+                    <td></td>
+                    <td class="vcenter">ID</td>
+                    <td class="vcenter">Razón social</td>
+                    <td class="vcenter visible-lg">Dirección</td>
+                    <td class="vcenter">Presidente</td>
+                    <td class="vcenter">Patrimonio neto</td>
+                    <!-- <td class="vcenter visible-lg">Inicio de act.</td> -->
+                    <td class="vcenter">Eliminar</td>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-6">
+            <h2>Pares</h2>
+            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-par">
+                <thead class="text-center">
+                <tr>
+                    <td></td>
+                    <td class="vcenter">ID</td>
+                    <td class="vcenter">Razón social</td>
+                    <td class="vcenter visible-lg">Dirección</td>
+                    <td class="vcenter">Presidente</td>
+                    <td class="vcenter">Patrimonio neto</td>
+                    <!-- <td class="vcenter visible-lg">Inicio de act.</td> -->
+                    <td class="vcenter">Eliminar</td>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
