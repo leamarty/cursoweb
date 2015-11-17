@@ -61,7 +61,11 @@ class Cliente
                                  $direccionCalle, $direccionAltura, $direccionCiudad, $direccionPais,
                                  $activo, $pasivo, $presidenteNombre, $presidenteApellido, $fechaCreacion)
     {
-        $this -> id = $id;
+        if (isset ($id)) {
+            $this -> id = $id;
+        } else {
+            unset ($this -> id);
+        }
         $this -> razonSocial = $razonSocial;
         $this -> logo = $logo;
         $this -> direccion = new Direccion ($direccionCalle, $direccionAltura, $direccionCiudad, isset ($direccionPais) ?: null);
@@ -174,23 +178,17 @@ if ($method == 'GET') {
     
 } elseif ($method == 'POST') {
     
-    if (! (isset ($_POST ['razonSocial']) && isset ($_POST ['logo']) && isset ($_POST ['direccion']) &&
-           isset ($_POST ['direccion'] ['calle']) && isset ($_POST ['direccion'] ['altura']) &&
-           isset ($_POST ['direccion'] ['ciudad']) && isset ($_POST ['direccion'] ['pais']) &&
-           isset ($_POST ['activo']) && isset ($_POST ['pasivo']) && isset ($_POST ['presidente']) &&
-           isset ($_POST ['presidente'] ['nombre']) && isset ($_POST ['presidente'] ['apellido']) )) {
+    if (! (isset ($_POST ['razonSocial']) && isset ($_POST ['logo']) && isset ($_POST ['direccionCalle']) &&
+           isset ($_POST ['direccionAltura']) && isset ($_POST ['direccionCiudad']) && isset ($_POST ['direccionPais']) &&
+           isset ($_POST ['activo']) && isset ($_POST ['pasivo']) && isset ($_POST ['presidenteNombre']) &&
+           isset ($_POST ['presidenteApellido']) )) {
         header ('HTTP/1.1 401 Unauthorized');
         exit();
     }
 
-    $razonSocial = $_POST ['razonSocial'];
-    $logo = $_POST ['logo'];
-    $direccion = new Direccion ($_POST ['direccion'] ['calle'], $_POST ['direccion'] ['altura'],
-                                $_POST ['direccion'] ['ciudad'], $_POST ['direccion'] ['pais'] );
-    $activo = $_POST ['activo'];
-    $pasivo = $_POST ['pasivo'];
-    $presidente = new Presidente ($_POST ['presidente'] ['nombre'], $_POST ['presidente'] ['apellido'] );
-    $fechaCreacion = (new DateTime('now')) -> format ('l, F d, Y H:i A');
+    $cliente = new Cliente (null, $_POST ['razonSocial'], $_POST ['logo'], $_POST ['direccionCalle'], $_POST ['direccionAltura'],
+                            $_POST ['direccionCiudad'], $_POST ['direccionPais'], $_POST ['activo'], $_POST ['pasivo'],
+                            $_POST ['presidenteNombre'], $_POST ['presidenteApellido'], (new DateTime('now')) -> format ('l, F d, Y H:i A') );
 
     $db = @new mysqli ('localhost', 'root', '', 'cursoweb');
     if ($db -> connect_error) {
@@ -198,17 +196,18 @@ if ($method == 'GET') {
         exit();
     }
 
-    $query = "INSERT INTO clientes VALUES ( {$razonSocial},
-                                            {$logo},
-                                            {$direccion ['direccion'] ['calle']},
-                                            {$direccion ['direccion'] ['altura']},
-                                            {$direccion ['direccion'] ['ciudad']},
-                                            {$direccion ['direccion'] ['pais']},
-                                            {$activo},
-                                            {$pasivo},
-                                            {$presidente ['nombre']},
-                                            {$presidente ['apellido']},
-                                            {$fechaCreacion} );";
+    $query = "INSERT INTO clientes VALUES ( null,
+                                            '{$cliente -> razonSocial}',
+                                            '{$cliente -> logo}',
+                                            '{$cliente -> direccion -> calle}',
+                                            '{$cliente -> direccion -> altura}',
+                                            '{$cliente -> direccion -> ciudad}',
+                                            '{$cliente -> direccion -> pais}',
+                                            '{$cliente -> activo}',
+                                            '{$cliente -> pasivo}',
+                                            '{$cliente -> presidente -> nombre}',
+                                            '{$cliente -> presidente -> apellido}',
+                                            '{$db -> real_escape_string ($cliente -> fechaCreacion)}' );";
     $resultado = $db -> query($query);
     if ($db -> error) {
         $db -> close();

@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link type="text/css" rel="stylesheet" href="estilos.css"/>
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script>
 
         $(document).ready(function () {
@@ -57,7 +58,7 @@
                                                         $("<button>").addClass("btn btn-danger boton-borrar").append(
                                                                 $("<span>").addClass("glyphicon glyphicon-remove")
                                                         )
-                                                )
+                                                ).attr("data-toggle", "tooltip").attr("title", "Este proceso es irreversible").attr("data-placement", "left")
                                         ).children("td").addClass("vcenter").parent()
                                 )
                             });
@@ -100,22 +101,22 @@
                 });
             });
 
-            function borrar_cliente (ele) {
+            function borrar_cliente (element) {
 
                 $.ajax({
                     url: "clientes.php",
                     type: "DELETE",
                     data: {
-                        id: $(ele).parents("tr").children("td")[1].textContent
+                        id: $(element).parents("tr").children("td")[1].textContent
                     },
 
                     error: function () {
                         mostrar_alert("error");
-                        $(ele).removeAttr("disabled");
+                        $(element).removeAttr("disabled");
                     },
 
                     success: function () {
-                        $(ele).parents("tr").remove();
+                        $(element).parents("tr").remove();
                     }
                 });
             }
@@ -126,12 +127,24 @@
                     $(this).attr("disabled", "");
                     borrar_cliente(this);
                 });
+                $("td[data-toggle='tooltip']").tooltip();
             }
+
+            $("a[href='#listado']").click();
+
+            $("a#boton_submit").click(function() {
+                $.post('clientes.php', $("form#myForm").serialize()).done(function() {
+                    $("form#myForm").find("input").val("");
+                    // mostrar alert de exito
+                }).fail(function() {
+                    // mostrar alert de error
+                });
+            });
         });
     </script>
 </head>
 <body>
-<div class="container">
+<div class="container-fluid">
     <div class="row">
         <div class="col-xs-12">
             <div class="jumbotron text-center">
@@ -141,72 +154,161 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-2">
-            <button class="btn btn-primary btn-lg" id="boton-buscar">
-                <span class="glyphicon glyphicon-search"></span> Buscar
-            </button>
-        </div>
-        <div class="col-sm-10" id="alerts-container">
-            <div class="alert alert-info" id="realice-busqueda">
-                <span class="glyphicon glyphicon-info-sign"></span> Realice una búsqueda para cargar la lista de clientes.
-            </div>
-            <div class="alert alert-info" id="comprobando-disponibilidad">
-                <span class="glyphicon glyphicon-info-sign"></span> Comprobando disponibilidad del servidor. Por favor, espere.
-            </div>
-            <div class="alert alert-danger" id="ocupado">
-                <span class="glyphicon glyphicon-remove"></span> El servidor se encuentra ocupado. Por favor, espere un momento e intente nuevamente.
-            </div>
-            <div class="alert alert-success" id="disponible">
-                <span class="glyphicon glyphicon-ok"></span> El servidor esta disponible para atender el pedido.
-            </div>
-            <div class="alert alert-danger" id="error">
-                <span class="glyphicon glyphicon-remove"></span> Hubo un error. Intente nuevamente.
-            </div>
-            <div class="alert alert-warning" id="agotado">
-                <span class="glyphicon glyphicon-warning-sign"></span> No hay más clientes.
-            </div>
+        <div class="col-xs-12">
+            <nav class="navbar navbar-default">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Telapong S.A.</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a data-toggle="tab" href="#listado"><span class="glyphicon glyphicon-search"></span> Listado de clientes</a></li>
+                        <li><a data-toggle="tab" href="#nuevo"><span class="glyphicon glyphicon-plus"></span> Nuevo cliente</a></li>
+                    </ul>
+                </div>
+            </nav>
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-6">
-            <h2>Impares</h2>
-            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-impar">
-                <thead class="text-center">
-                <tr>
-                    <td></td>
-                    <td class="vcenter">ID</td>
-                    <td class="vcenter">Razón social</td>
-                    <td class="vcenter visible-lg">Dirección</td>
-                    <td class="vcenter">Presidente</td>
-                    <td class="vcenter">Patrimonio neto</td>
-                    <!-- <td class="vcenter visible-lg">Inicio de act.</td> -->
-                    <td class="vcenter">Eliminar</td>
-                </tr>
-                </thead>
-                <tbody>
+        <div class="col-xs-12">
+            <div class="tab-content">
+                <div class="tab-pane active" id="listado">
+                    <div class="row">
+                        <div class="col-sm-1">
+                            <button class="btn btn-primary btn-lg" id="boton-buscar">
+                                <span class="glyphicon glyphicon-search"></span> Buscar
+                            </button>
+                        </div>
+                        <div class="col-sm-1">
+                            <p></p>
+                        </div>
+                        <div class="col-sm-10" id="alerts-container">
+                            <div class="alert alert-info" id="realice-busqueda">
+                                <span class="glyphicon glyphicon-info-sign"></span> Realice una búsqueda para cargar la lista de clientes.
+                            </div>
+                            <div class="alert alert-info" id="comprobando-disponibilidad">
+                                <span class="glyphicon glyphicon-info-sign"></span> Comprobando disponibilidad del servidor. Por favor, espere.
+                            </div>
+                            <div class="alert alert-danger" id="ocupado">
+                                <span class="glyphicon glyphicon-remove"></span> El servidor se encuentra ocupado. Por favor, espere un momento e intente nuevamente.
+                            </div>
+                            <div class="alert alert-success" id="disponible">
+                                <span class="glyphicon glyphicon-ok"></span> El servidor esta disponible para atender el pedido.
+                            </div>
+                            <div class="alert alert-danger" id="error">
+                                <span class="glyphicon glyphicon-remove"></span> Hubo un error. Intente nuevamente.
+                            </div>
+                            <div class="alert alert-warning" id="agotado">
+                                <span class="glyphicon glyphicon-warning-sign"></span> No hay más clientes.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h2>Impares</h2>
+                            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-impar">
+                                <thead class="text-center">
+                                <tr>
+                                    <td></td>
+                                    <td class="vcenter">ID</td>
+                                    <td class="vcenter">Razón social</td>
+                                    <td class="vcenter visible-lg">Dirección</td>
+                                    <td class="vcenter">Presidente</td>
+                                    <td class="vcenter">Patrimonio neto</td>
+                                    <!-- <td class="vcenter visible-lg">Inicio de act.</td> -->
+                                    <td class="vcenter">Eliminar</td>
+                                </tr>
+                                </thead>
+                                <tbody>
 
-                </tbody>
-            </table>
-        </div>
-        <div class="col-sm-6">
-            <h2>Pares</h2>
-            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-par">
-                <thead class="text-center">
-                <tr>
-                    <td></td>
-                    <td class="vcenter">ID</td>
-                    <td class="vcenter">Razón social</td>
-                    <td class="vcenter visible-lg">Dirección</td>
-                    <td class="vcenter">Presidente</td>
-                    <td class="vcenter">Patrimonio neto</td>
-                    <!-- <td class="vcenter visible-lg">Inicio de act.</td> -->
-                    <td class="vcenter">Eliminar</td>
-                </tr>
-                </thead>
-                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-6">
+                            <h2>Pares</h2>
+                            <table class="table table-bordered table-striped table-hover" id="tabla-clientes-par">
+                                <thead class="text-center">
+                                <tr>
+                                    <td></td>
+                                    <td class="vcenter">ID</td>
+                                    <td class="vcenter">Razón social</td>
+                                    <td class="vcenter visible-lg">Dirección</td>
+                                    <td class="vcenter">Presidente</td>
+                                    <td class="vcenter">Patrimonio neto</td>
+                                    <!-- <td class="vcenter visible-lg">Inicio de act.</td> -->
+                                    <td class="vcenter">Eliminar</td>
+                                </tr>
+                                </thead>
+                                <tbody>
 
-                </tbody>
-            </table>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="nuevo">
+                    <h2>Nuevo Cliente</h2>
+                    <form id="myForm">
+                        <div class="row">
+                            <div class="col-sm-6 form-group">
+                                <label class="visible-lg visible-md" for="razon_social">Razón social:</label>
+                                <input type="text" class="form-control" id="razon_social" name="razonSocial" placeholder="Razón social">
+                            </div>
+                            <div class="col-sm-6 form-group">
+                                <label class="visible-lg visible-md" for="logo">Logo:</label>
+                                <input type="text" class="form-control" id="logo" name="logo" placeholder="Logo">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 form-group">
+                                <label class="visible-lg visible-md" for="direccion_calle">Calle:</label>
+                                <input type="text" class="form-control" id="direccion_calle" name="direccionCalle" placeholder="Calle">
+                            </div>
+                            <div class="col-sm-2 form-group">
+                                <label class="visible-lg visible-md" for="direccion_altura">Altura:</label>
+                                <input type="text" class="form-control" id="direccion_altura" name="direccionAltura" placeholder="Altura">
+                            </div>
+                            <div class="col-sm-3 form-group">
+                                <label class="visible-lg visible-md" for="direccion_ciudad">Ciudad:</label>
+                                <input type="text" class="form-control" id="direccion_ciudad" name="direccionCiudad" placeholder="Ciudad">
+                            </div>
+                            <div class="col-sm-3 form-group">
+                                <label class="visible-lg visible-md" for="direccion_pais">País:</label>
+                                <input type="text" class="form-control" id="direccion_pais" name="direccionPais" placeholder="País">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 form-group">
+                                <label class="visible-lg visible-md" for="activo">Activo:</label>
+                                <input type="text" class="form-control" id="activo" name="activo" placeholder="Activo">
+                            </div>
+                            <div class="col-sm-6 form-group">
+                                <label class="visible-lg visible-md" for="pasivo">Pasivo:</label>
+                                <input type="text" class="form-control" id="pasivo" name="pasivo" placeholder="Pasivo">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 form-group">
+                                <label class="visible-lg visible-md" for="presidente_nombre">Nombre del presidente:</label>
+                                <input type="text" class="form-control" id="presidente_nombre" name="presidenteNombre" placeholder="Nombre del presidente">
+                            </div>
+                            <div class="col-sm-6 form-group">
+                                <label class="visible-lg visible-md" for="presidente_apellido">Apellido del presidente:</label>
+                                <input type="text" class="form-control" id="presidente_apellido" name="presidenteApellido" placeholder="Apellido del presidente">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 text-right">
+                                <a class="btn btn-primary" href="#" id="boton_submit">Guardar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
