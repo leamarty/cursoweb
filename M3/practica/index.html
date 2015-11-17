@@ -21,11 +21,12 @@
                 }
             }
 
-            function mostrar_alert(id) {
-                $("div#alerts-container").children("div:not(#" + id + ")").hide().parent().children("div#" + id).show();
+            function mostrar_alert(tab, id) {
+                $("div#alerts-container-" + tab).children("div:not(#" + id + ")").hide().parent().children("div#" + id).show();
             }
 
-            mostrar_alert("realice-busqueda");
+            mostrar_alert("listado", "realice-busqueda");
+            mostrar_alert("nuevo", "este-div-no-existe-lalala");
 
             function pedir_clientes(paridad) {
 
@@ -37,7 +38,7 @@
                             filtro: paridad
 
                         }).fail(function () {
-                            mostrar_alert("error");
+                            mostrar_alert("listado", "error");
                             habilitar_boton();
 
                         }).done(function (json) {
@@ -66,7 +67,7 @@
                             bindear_botones_borrar();
 
                             /* if (json.length < 5) {
-                                mostrar_alert("agotado");
+                                mostrar_alert("listado", "agotado");
                             } else { */
                                 habilitar_boton();
                             /* } */
@@ -76,7 +77,7 @@
             $("#boton-buscar").click(function () {
 
                 $(this).attr("disabled", "");
-                mostrar_alert("comprobando-disponibilidad");
+                mostrar_alert("listado", "comprobando-disponibilidad");
 
                 $.ajax({
                     url: "http://ccvalsina.com/cursoweb/autorizacion.php",
@@ -84,7 +85,7 @@
                     cache: false,
 
                     error: function () {
-                        mostrar_alert("ocupado");
+                        mostrar_alert("listado", "ocupado");
                         $("#boton-buscar").removeAttr("disabled");
                         // borrar el siguiente for cuando vuelva internet y descomentar la linea de arriba
                         /* for (var paridad in {"impar": "", "par": ""}) {
@@ -93,7 +94,7 @@
                     },
 
                     success: function () {
-                        mostrar_alert("disponible");
+                        mostrar_alert("listado", "disponible");
                         for (var paridad in {"impar": "", "par": ""}) {
                             pedir_clientes(paridad);
                         }
@@ -111,7 +112,7 @@
                     },
 
                     error: function () {
-                        mostrar_alert("error");
+                        mostrar_alert("listado", "error");
                         $(element).removeAttr("disabled");
                     },
 
@@ -130,14 +131,21 @@
                 $("td[data-toggle='tooltip']").tooltip();
             }
 
-            $("a[href='#listado']").click();
+            var hash = window.location.hash;
+            if (hash && hash == "#nuevo") {
+                $("a[href='#nuevo']").click();
+            }
 
             $("a#boton_submit").click(function() {
-                $.post('clientes.php', $("form#myForm").serialize()).done(function() {
+                $.post( 'clientes.php',
+                        $("form#myForm").serialize()
+
+                ).done(function() {
                     $("form#myForm").find("input").val("");
-                    // mostrar alert de exito
+                    mostrar_alert("nuevo", "cargado-exito");
+
                 }).fail(function() {
-                    // mostrar alert de error
+                    mostrar_alert("nuevo", "cargado-error");
                 });
             });
         });
@@ -186,7 +194,7 @@
                         <div class="col-sm-1">
                             <p></p>
                         </div>
-                        <div class="col-sm-10" id="alerts-container">
+                        <div class="col-sm-10" id="alerts-container-listado">
                             <div class="alert alert-info" id="realice-busqueda">
                                 <span class="glyphicon glyphicon-info-sign"></span> Realice una búsqueda para cargar la lista de clientes.
                             </div>
@@ -251,62 +259,76 @@
                     </div>
                 </div>
                 <div class="tab-pane" id="nuevo">
-                    <h2>Nuevo Cliente</h2>
-                    <form id="myForm">
-                        <div class="row">
-                            <div class="col-sm-6 form-group">
-                                <label class="visible-lg visible-md" for="razon_social">Razón social:</label>
-                                <input type="text" class="form-control" id="razon_social" name="razonSocial" placeholder="Razón social">
+                    <div class="row">
+                        <div class="col-xs-12" id="alerts-container-nuevo">
+                            <div class="alert alert-success" id="cargado-exito">
+                                <span class="glyphicon glyphicon-ok"></span> El cliente fue agregado exitosamente.
                             </div>
-                            <div class="col-sm-6 form-group">
-                                <label class="visible-lg visible-md" for="logo">Logo:</label>
-                                <input type="text" class="form-control" id="logo" name="logo" placeholder="Logo">
+                            <div class="alert alert-danger" id="cargado-error">
+                                <span class="glyphicon glyphicon-remove"></span> Hubo un error al cargar el cliente.
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-4 form-group">
-                                <label class="visible-lg visible-md" for="direccion_calle">Calle:</label>
-                                <input type="text" class="form-control" id="direccion_calle" name="direccionCalle" placeholder="Calle">
-                            </div>
-                            <div class="col-sm-2 form-group">
-                                <label class="visible-lg visible-md" for="direccion_altura">Altura:</label>
-                                <input type="text" class="form-control" id="direccion_altura" name="direccionAltura" placeholder="Altura">
-                            </div>
-                            <div class="col-sm-3 form-group">
-                                <label class="visible-lg visible-md" for="direccion_ciudad">Ciudad:</label>
-                                <input type="text" class="form-control" id="direccion_ciudad" name="direccionCiudad" placeholder="Ciudad">
-                            </div>
-                            <div class="col-sm-3 form-group">
-                                <label class="visible-lg visible-md" for="direccion_pais">País:</label>
-                                <input type="text" class="form-control" id="direccion_pais" name="direccionPais" placeholder="País">
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h2>Nuevo Cliente</h2>
+                            <form class="form-horizontal" id="myForm" role="form">
+                                <div class="row">
+                                    <div class="col-sm-6 form-group">
+                                        <label class="control-label visible-lg visible-md" for="razon-social">Razón social:</label>
+                                        <input type="text" class="form-control" id="razon-social" name="razonSocial" placeholder="Razón social">
+                                    </div>
+                                    <div class="col-sm-6 form-group">
+                                        <label class="control-label visible-lg visible-md" for="logo">Logo:</label>
+                                        <input type="text" class="form-control" id="logo" name="logo" placeholder="Logo">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4 form-group">
+                                        <label class="control-label visible-lg visible-md" for="direccion-calle">Calle:</label>
+                                        <input type="text" class="form-control" id="direccion-calle" name="direccionCalle" placeholder="Calle">
+                                    </div>
+                                    <div class="col-sm-2 form-group">
+                                        <label class="control-label visible-lg visible-md" for="direccion-altura">Altura:</label>
+                                        <input type="text" class="form-control" id="direccion-altura" name="direccionAltura" placeholder="Altura">
+                                    </div>
+                                    <div class="col-sm-3 form-group">
+                                        <label class="control-label visible-lg visible-md" for="direccion-ciudad">Ciudad:</label>
+                                        <input type="text" class="form-control" id="direccion-ciudad" name="direccionCiudad" placeholder="Ciudad">
+                                    </div>
+                                    <div class="col-sm-3 form-group">
+                                        <label class="control-label visible-lg visible-md" for="direccion-pais">País:</label>
+                                        <input type="text" class="form-control" id="direccion-pais" name="direccionPais" placeholder="País">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6 form-group">
+                                        <label class="control-label visible-lg visible-md" for="activo">Activo:</label>
+                                        <input type="text" class="form-control" id="activo" name="activo" placeholder="Activo">
+                                    </div>
+                                    <div class="col-sm-6 form-group">
+                                        <label class="control-label visible-lg visible-md" for="pasivo">Pasivo:</label>
+                                        <input type="text" class="form-control" id="pasivo" name="pasivo" placeholder="Pasivo">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6 form-group">
+                                        <label class="control-label visible-lg visible-md" for="presidente-nombre">Nombre del presidente:</label>
+                                        <input type="text" class="form-control" id="presidente-nombre" name="presidenteNombre" placeholder="Nombre del presidente">
+                                    </div>
+                                    <div class="col-sm-6 form-group">
+                                        <label class="control-label visible-lg visible-md" for="presidente-apellido">Apellido del presidente:</label>
+                                        <input type="text" class="form-control" id="presidente-apellido" name="presidenteApellido" placeholder="Apellido del presidente">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 text-right">
+                                        <a class="btn btn-primary" id="boton_submit" href="#">Guardar</a>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-6 form-group">
-                                <label class="visible-lg visible-md" for="activo">Activo:</label>
-                                <input type="text" class="form-control" id="activo" name="activo" placeholder="Activo">
-                            </div>
-                            <div class="col-sm-6 form-group">
-                                <label class="visible-lg visible-md" for="pasivo">Pasivo:</label>
-                                <input type="text" class="form-control" id="pasivo" name="pasivo" placeholder="Pasivo">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6 form-group">
-                                <label class="visible-lg visible-md" for="presidente_nombre">Nombre del presidente:</label>
-                                <input type="text" class="form-control" id="presidente_nombre" name="presidenteNombre" placeholder="Nombre del presidente">
-                            </div>
-                            <div class="col-sm-6 form-group">
-                                <label class="visible-lg visible-md" for="presidente_apellido">Apellido del presidente:</label>
-                                <input type="text" class="form-control" id="presidente_apellido" name="presidenteApellido" placeholder="Apellido del presidente">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12 text-right">
-                                <a class="btn btn-primary" href="#" id="boton_submit">Guardar</a>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

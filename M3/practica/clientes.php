@@ -1,6 +1,6 @@
 <?php
 
-if (! isset ($_SERVER ['REQUEST_METHOD'])) {
+if (empty ($_SERVER ['REQUEST_METHOD'])) {
     header ('HTTP/1.1 401 Unauthorized');
     exit();
 }
@@ -82,8 +82,8 @@ class Cliente
 
 if ($method == 'GET') {
 
-    if (! (isset ($_GET ['filtro']) && isset ($_GET ['desde']) && isset ($_GET ['cantidad']) )) {
-        if (isset ($_GET ['filtro']) && $_GET ['filtro'] == 'impar') {
+    if (empty ($_GET ['filtro']) || empty ($_GET ['desde']) || ! isset ($_GET ['cantidad']) ) {
+        if (empty ($_GET ['filtro']) || $_GET ['filtro'] == 'impar') {
             sleep(3);
         }
         header ('HTTP/1.1 401 Unauthorized');
@@ -178,10 +178,10 @@ if ($method == 'GET') {
     
 } elseif ($method == 'POST') {
     
-    if (! (isset ($_POST ['razonSocial']) && isset ($_POST ['logo']) && isset ($_POST ['direccionCalle']) &&
-           isset ($_POST ['direccionAltura']) && isset ($_POST ['direccionCiudad']) && isset ($_POST ['direccionPais']) &&
-           isset ($_POST ['activo']) && isset ($_POST ['pasivo']) && isset ($_POST ['presidenteNombre']) &&
-           isset ($_POST ['presidenteApellido']) )) {
+    if ( empty ($_POST ['razonSocial']) || empty ($_POST ['logo']) || empty ($_POST ['direccionCalle']) ||
+         empty ($_POST ['direccionAltura']) || empty ($_POST ['direccionCiudad']) || empty ($_POST ['direccionPais']) ||
+         ! isset ($_POST ['activo']) || ! isset ($_POST ['pasivo']) || empty ($_POST ['presidenteNombre']) ||
+         empty ($_POST ['presidenteApellido']) ) {
         header ('HTTP/1.1 401 Unauthorized');
         exit();
     }
@@ -221,7 +221,7 @@ if ($method == 'GET') {
     
 } elseif ($method == 'DELETE') {
     
-    if (! isset ($_REQUEST ['id'])) {
+    if (empty ($_REQUEST ['id'])) {
         sleep(2);
         header ('HTTP/1.1 401 Unauthorized');
         exit();
