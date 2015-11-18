@@ -4,42 +4,24 @@ $json = file_get_contents('clientes.json');
 
 $clientes = json_decode($json, true);
 
+$i = 0;
+$cond = $_REQUEST['cond'];
+$in = $_REQUEST['in'];
 
-//if ($_REQUEST['cond'] == 'p') {
+foreach ($clientes as $key => $value) {
+    if ($in <= $key) {
+        if ($cond == 'p' && $key % 2 == 1) {
+            $res[$key] = $clientes[$key];
+        } elseif ($clientes[$key]['id'] == 1 && $cond == 'i' || $cond == 'i' && $clientes[$key]['id'] % 2 == 1) {
+            $res[$key] = $clientes[$key];
 
-$a=$_REQUEST['cond'];
-$i=$_REQUEST['in'];
-$c=$_REQUEST['can'];
-while($i<$c){
-    if ( ($i % 2) ==1 && $a=='p' ) {
-        $rta[$i] = array(
-            'logo' => $clientes[$i]['logo'],
-            'id' => $clientes[$i]['id'],
-            'razs' => $clientes[$i]['razonSocial'],
-            'pres' => $clientes[$i]['presidente'],
-            'patri' => "1"
-        );
-    }else{if( ($i%2)==0 && $a=='i') {
-        $rta[$i] = array(
-            'logo' => $clientes[$i]['logo'],
-            'id' => $clientes[$i]['id'],
-            'razs' => $clientes[$i]['razonSocial'],
-            'pres' => $clientes[$i]['presidente'],
-            'patri' => "1"
-        );
+        }
+        if (++$i > 9) {
+            break;
+        }
     }
-    }
-
-    $i++;
-
 }
-if($a=='i'){
+if ($cond == 'i') {
     sleep(3);
 }
-echo json_encode($rta);
-
-
-
-
-
-
+echo json_encode($res);

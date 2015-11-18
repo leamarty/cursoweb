@@ -7,143 +7,75 @@
     <link type="text/css" rel="stylesheet" href="estilos.css"/>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="clientes.js"></script>
     <script>
         $(document).ready(function () {
-            /*$.getJSON('clientes.php', {filtrame: 'caca'}, function (giles) {
-             var tablaTemporal = $('<table>').addClass('table table-bordered').append(
-             $('<tbody>')
-             );
-             $(giles).each(function (key, value) {
-             $(tablaTemporal).find('tbody').append(
-             $('<tr>').append(
-             $('<td>').text(value.nombre),
-             $('<td>').text(value.edad)
-             )
-             )
-             });
-             $('#los-giles').append(tablaTemporal);
-
-             });*/
             var ini = 0;
-            var cant = 10;
             var responseS = 0;
-
-            function finished() {
-                if (++responseS === 2) {
-                    //$('#boton-buscar').attr("disabled", false);
-                    //responseS=0;
-                    if (cant < 30) {
-                        cant = cant + 10;
-                        ini = ini + 10;
-                        $('#boton-buscar').attr("disabled", false);
-                        responseS = 0;
-                    } else {
-                        if (cant < 35) {
-                            cant = cant + 5;
-                            ini = ini + 10;
-                            $('#boton-buscar').attr("disabled", false);
-                            responseS = 0;
-                        } else {
-                            $('div#mensaje-alerta').attr("class", "alert alert-info").text("No hay mas clientes!!.");
-                        }
-                    }
-
-
+            function gtJson(tTable) {
+                var auxTable;
+                if (tTable == 'i') {
+                    auxTable = 'table#tabla-impares'
+                } else {
+                    auxTable = 'table#tabla-pares'
                 }
-            }
-
-            $('#boton-buscar').click(function () {
-                $(this).attr("disabled", true);
-                $.ajax({
-                    type: "GET",
-                    url: "http://ccvalsina.com/cursoweb/autorizacion.php",
-                    success: function () {
-                        $('div#mensaje-alerta').attr("class", "alert alert-info").text("El servidor esta disponible para atender el pedido.");
-
-                        $.getJSON('clientes.php', {cond: 'p', can: cant, in: ini}, function (rta) {
-                            var tablaParesBody = $('table#tabla-pares').find('tbody');
+                $.getJSON('clientes.php', {cond: tTable, in: ini})
+                        .done(function (rta) {
+                            var tablaParesBody = $(auxTable).find('tbody');
                             if (tablaParesBody.find('tr').length == 1) {
                                 tablaParesBody.html('');
                             }
                             $.each(rta, function (k) {
-
-                                $('table#tabla-pares').append(
+                                $(auxTable + '>tbody').append(
                                         $('<tr>').append(
-                                                $('<td>').text(rta[k]['logo']),
+                                                $('<td>').addClass("text-center").append(
+                                                        $("<img>").attr("src", rta[k]['logo'])),
                                                 $('<td>').text(rta[k]['id']),
-                                                $('<td>').text(rta[k]['razs']),
-                                                $('<td>').text(rta[k]['pres'].nombre + ' ' + rta[k]['pres'].apellido),
-                                                $('<td>').text(rta[k]['patri'])
+                                                $('<td>').text(rta[k]['razonSocial']),
+                                                $('<td>').text(rta[k]['presidente'].nombre + ' ' + rta[k]['presidente'].apellido),
+                                                $('<td>').addClass('text-right').addClass(rta[k]['activo'] >= rta[k]['pasivo'] ? 'success' : 'danger').text((rta[k]['activo'] - rta[k]['pasivo']).toFixed(2))
                                         )
                                 )
                             });
                             finished();
+                        })
+                        .fail(function () {
+                            alert('error');
+                            $('#boton-buscar').attr("disabled", false);
                         });
-                        $.getJSON('clientes.php', {cond: 'i', can: cant, in: ini}, function (rta) {
-                            var tablaImparesBody = $('table#tabla-impares').find('tbody');
-                            if (tablaImparesBody.find('tr').length == 1) {
-                                tablaImparesBody.html('');
-                            }
-                            $.each(rta, function (k) {
-
-                                $('table#tabla-impares').append(
-                                        $('<tr>').append(
-                                                $('<td>').text(rta[k]['logo']),
-                                                $('<td>').text(rta[k]['id']),
-                                                $('<td>').text(rta[k]['razs']),
-                                                $('<td>').text(rta[k]['pres'].nombre + ' ' + rta[k]['pres'].apellido),
-                                                $('<td>').text(rta[k]['patri'])
-                                        )
-                                )
-                            });
-                            finished();
+            }
+            function finished() {
+                if (++responseS == 2) {
+                    $('#boton-buscar').attr("disabled", false);
+                    ini = ini + 10;
+                    responseS = 0;
+                }
+                if (clientes.length < ini) {
+                    $('div#mensaje-alerta').html('<div  class=\"alert alert-success\"><span class=\"glyphicon glyphicon-check\"></span> No hay mas clientes disponibles.</div>');
+                    $('#boton-buscar').attr("disabled", true);
+                }
+            }
+            $('#boton-buscar').click(function () {
+                $(this).attr("disabled", true);
+                $.get("http://ccvalsina.com/cursoweb/autorizacion.php")
+                        .done(function () {
+                            $('div#mensaje-alerta').html('<div  class=\"alert alert-success\"><span class=\"glyphicon glyphicon-ok-sign\"></span> El servidor esta disponible para atender el pedido.</div>');
+                            //$('div#mensaje-alerta').attr("class", "alert alert-success").text("El servidor esta disponible para atender el pedido.");
+                            gtJson('p');
+                            gtJson('i');
+                        })
+                        .fail(function () {
+                            $('div#mensaje-alerta').html('<div  class=\"alert alert-danger\"><span class=\"glyphicon glyphicon-info-sign\"></span> El servidor se encuentra ocupado. Porfavor aguarde e intente nuevamente.</div>');
+                            //$('div#mensaje-alerta').attr("class", "alert alert-danger").text("El servidor se encuentra ocupado. Por favor aguarde e intente nuevamente.");
+                            $('#boton-buscar').attr("disabled", false);
                         });
-
-                    },
-                    error: function () {
-                        $('div#mensaje-alerta').attr("class", "alert alert-danger").text("El servidor se encuentra ocupado. Por favor aguarde e intente nuevamente.");
-                        $('#boton-buscar').attr("disabled", false);
-                    }
-
-                });
-
-
-                /*var tablaClientesBody = $('#tabla-clientes').find('tbody');
-                 if (tablaClientesBody.find('tr').length == 1) {
-                 tablaClientesBody.html('');
-                 }
-                 var cantidadExistente = tablaClientesBody.find('tr').length;
-                 var i = cantidadExistente;
-                 while (i < clientes.length && (i - cantidadExistente) < 10) {
-                 var cliente = clientes[i];
-                 tablaClientesBody.append(
-                 $('<tr>').append(
-                 $('<td>').addClass('text-center').append(
-                 $('<img>').attr('src', cliente.logo)
-                 ),
-                 $('<td>').text(cliente.id),
-                 $('<td>').text(cliente.razonSocial),
-                 $('<td>').text(cliente.direccion.calle + ' ' + cliente.direccion.altura + ', ' + cliente.direccion.ciudad),
-                 $('<td>').text(cliente.presidente.nombre + ' ' + cliente.presidente.apellido),
-                 $('<td>').addClass('text-right').addClass(cliente.activo >= cliente.pasivo ? 'success' : 'danger').text('$ ' + (cliente.activo - cliente.pasivo).toFixed(2)),
-                 $('<td>').text(cliente.fechaCreacion)
-                 )
-                 );
-                 i++;
-                 }
-                 if (tablaClientesBody.find('tr').length >= clientes.length) {
-                 $('#boton-buscar').attr('disabled', 'disabled');
-                 }*/
-
-            })
-            ;
-        })
-        ;
+            });
+        });
     </script>
 </head>
 <body>
-<div class="jumbotron text-center">
-    <div class="container">
+<div class="container">
+    <div class="jumbotron text-center">
         <div class="row">
             <div class="col-md-12">
                 <h1>Telapong S.A.</h1>
@@ -152,90 +84,63 @@
             </div>
         </div>
     </div>
-</div>
-<div class="container">
     <div class="row">
         <div class="col-sm-4 text-left">
-            <button id="boton-buscar" class="btn btn-primary btn-lg">Buscar</button>
+            <button id="boton-buscar" class="btn btn-primary btn-lg">
+                <span class="glyphicon glyphicon-search"></span> Buscar
+            </button>
             <br>
             <br>
         </div>
         <div class="col-sm-8">
             <div id="mensaje-alerta">
-
             </div>
-
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <h1>Impares</h1>
-
             <div class="row">
-                <div class="col-md-12">
-                    <table id="tabla-impares" class="table table-bordered table-striped table-hover">
-                        <thead>
-                        <tr>
-                            <td></td>
-                            <td>ID</td>
-                            <td>Razon Social</td>
-                            <td>Presidente</td>
-                            <td>Patrimonio neto</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <td class="text-center" colspan="5">Sin clientes. Debe realizar una busqueda.</td>
-                        </tbody>
-                    </table>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1>Impares</h1>
+                            <table id="tabla-impares" class="table table-bordered table-striped table-hover">
+                                <thead>
+                                <tr>
+                                    <td></td>
+                                    <td>ID</td>
+                                    <td>Razon Social</td>
+                                    <td>Presidente</td>
+                                    <td>Patrimonio neto</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <td class="text-center" colspan="5">Sin clientes. Debe realizar una busqueda.</td>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1>Pares</h1>
+                            <table id="tabla-pares" class="table table-bordered table-striped table-hover">
+                                <thead>
+                                <tr>
+                                    <td></td>
+                                    <td>ID</td>
+                                    <td>Razon Solcial</td>
+                                    <td>Presidente</td>
+                                    <td>Patrimonio neto</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <td class="text-center" colspan="5">Sin clientes. Debe realizar una busqueda.</td>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <h1>Pares</h1>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <table id="tabla-pares" class="table table-bordered table-striped table-hover">
-                        <thead>
-                        <tr>
-                            <td></td>
-                            <td>ID</td>
-                            <td>Razon Solcial</td>
-                            <td>Presidente</td>
-                            <td>Patrimonio neto</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <td class="text-center" colspan="5">Sin clientes. Debe realizar una busqueda.</td>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--<div id="row-tabla" class="row">
-        <div class="col-md-12">
-            <table id="tabla-clientes" class="table table-bordered table-striped table-hover">
-                <thead class="text-center bold">
-                <tr>
-                    <td></td>
-                    <td>ID</td>
-                    <td>Razón social</td>
-                    <td>Dirección</td>
-                    <td>Presidente</td>
-                    <td>Patrimonio neto</td>
-                    <td>Inicio de act.</td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.</td>
-                </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 </div>
--->
 </body>
 </html>
