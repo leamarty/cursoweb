@@ -14,71 +14,7 @@ if (in_array ($method, array ('PUT', 'DELETE') )) {
     $_REQUEST = $params + $_REQUEST;
 }
 
-class Presidente
-{
-    public $nombre;
-    public $apellido;
-
-    public function __construct ($nombre, $apellido)
-    {
-        $this -> nombre = $nombre;
-        $this -> apellido = $apellido;
-    }
-}
-
-class Direccion
-{
-    public $calle;
-    public $altura;
-    public $ciudad;
-    public $pais;
-
-    public function __construct ($calle, $altura, $ciudad, $pais)
-    {
-        $this -> calle = $calle;
-        $this -> altura = $altura;
-        $this -> ciudad = $ciudad;
-        if (isset ($pais)) {
-            $this -> pais = $pais;
-        } else {
-            unset ($this -> pais);
-        }
-    }
-}
-
-class Cliente
-{
-    public $id;
-    public $razonSocial;
-    public $logo;
-    public $direccion;
-    public $activo;
-    public $pasivo;
-    public $presidente;
-    public $fechaCreacion;
-
-    public function __construct ($id, $razonSocial, $logo,
-                                 $direccionCalle, $direccionAltura, $direccionCiudad, $direccionPais,
-                                 $activo, $pasivo, $presidenteNombre, $presidenteApellido, $fechaCreacion)
-    {
-        if (isset ($id)) {
-            $this -> id = $id;
-        } else {
-            unset ($this -> id);
-        }
-        $this -> razonSocial = $razonSocial;
-        $this -> logo = $logo;
-        $this -> direccion = new Direccion ($direccionCalle, $direccionAltura, $direccionCiudad, isset ($direccionPais) ?: null);
-        $this -> activo = $activo;
-        $this -> pasivo = $pasivo;
-        $this -> presidente = new Presidente ($presidenteNombre, $presidenteApellido);
-        if (isset ($fechaCreacion)) {
-            $this -> fechaCreacion = $fechaCreacion;
-        } else {
-            unset ($this -> fechaCreacion);
-        }
-    }
-}
+require_once ('cliente.php');
 
 if ($method == 'GET') {
 
@@ -151,7 +87,7 @@ if ($method == 'GET') {
                      presidente_nombre,
                      presidente_apellido
               FROM clientes WHERE id >= {$desde} AND id % 2 = {$paridad} LIMIT {$cantidad} ;";
-    $resultado = $db -> query($query);
+    $resultado = $db -> query ($query);
     if ($db -> error) {
         $db -> close();
         if ($filtro == 'impar') {
@@ -190,68 +126,28 @@ if ($method == 'GET') {
                             $_POST ['direccionCiudad'], $_POST ['direccionPais'], $_POST ['activo'], $_POST ['pasivo'],
                             $_POST ['presidenteNombre'], $_POST ['presidenteApellido'], (new DateTime('now')) -> format ('l, F d, Y H:i A') );
 
-    $db = @new mysqli ('localhost', 'root', '', 'cursoweb');
-    if ($db -> connect_error) {
+    if (! $cliente -> guardar() ) {
         header ('HTTP/1.1 500 Internal Server Error');
         exit();
     }
-
-    $query = "INSERT INTO clientes VALUES ( null,
-                                            '{$cliente -> razonSocial}',
-                                            '{$cliente -> logo}',
-                                            '{$cliente -> direccion -> calle}',
-                                            '{$cliente -> direccion -> altura}',
-                                            '{$cliente -> direccion -> ciudad}',
-                                            '{$cliente -> direccion -> pais}',
-                                            '{$cliente -> activo}',
-                                            '{$cliente -> pasivo}',
-                                            '{$cliente -> presidente -> nombre}',
-                                            '{$cliente -> presidente -> apellido}',
-                                            '{$db -> real_escape_string ($cliente -> fechaCreacion)}' );";
-    $resultado = $db -> query($query);
-    if ($db -> error) {
-        $db -> close();
-        header ('HTTP/1.1 500 Internal Server Error');
-        exit();
-    }
-
-    $db -> close();
 
     // devuelve 200 OK automaticamente
     
 } elseif ($method == 'DELETE') {
     
-    if (empty ($_REQUEST ['id'])) {
+    if (empty ($_REQUEST ['id']) || ! is_numeric ($_REQUEST ['id']) || $_REQUEST ['id'] < 1 ) {
         sleep(2);
         header ('HTTP/1.1 401 Unauthorized');
         exit();
     }
 
-    $id = $_REQUEST ['id'];
+    $cliente = new Cliente ($_REQUEST ['id']);
 
-    if (! is_numeric ($id) || $id < 1) {
-        sleep(2);
-        header ('HTTP/1.1 401 Unauthorized');
-        exit();
-    }
-
-    $db = @new mysqli ('localhost', 'root', '', 'cursoweb');
-    if ($db -> connect_error) {
+    if (! $cliente -> borrar() ) {
         sleep(2);
         header ('HTTP/1.1 500 Internal Server Error');
         exit();
     }
-
-    $query = "DELETE FROM clientes WHERE id = {$id} ;";
-    $resultado = $db -> query($query);
-    if ($db -> error) {
-        $db -> close();
-        sleep(2);
-        header ('HTTP/1.1 500 Internal Server Error');
-        exit();
-    }
-
-    $db -> close();
 
     sleep(2);
     // devuelve 200 OK automaticamente
