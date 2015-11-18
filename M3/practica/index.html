@@ -16,8 +16,20 @@
 
             function habilitar_boton() {
                 if (++tablas_cargadas == 2) {
+                    if (clientes_agotados == 1) {
+                        clientes_agotados = 0;
+                    }
                     tablas_cargadas = 0;
                     $("#boton-buscar").removeAttr("disabled");
+                }
+            }
+
+            var clientes_agotados = 0;
+
+            function verificar_clientes_agotados() {
+                if (++clientes_agotados == 2) {
+                    clientes_agotados = 0;
+                    mostrar_alert("listado", "agotado");
                 }
             }
 
@@ -30,10 +42,16 @@
 
             function pedir_clientes(paridad) {
 
+                var desde = 1;
+                var a = $('table#tabla-clientes-' + paridad + ' > tbody').children('tr');
+                if (a.length > 0) {
+                    desde = parseInt(a.first().find("td")[1].textContent) + 1;
+                }
+
                 $.getJSON(
                         "clientes.php",
                         {
-                            desde: $("table#tabla-clientes-impar").children("tbody").children("tr").length * 2 + 1,
+                            desde: desde,
                             cantidad: 5,
                             filtro: paridad
 
@@ -66,11 +84,10 @@
                             $("table#tabla-clientes-" + paridad).children("tbody").prepend($(tabla_temporal).html());
                             bindear_botones_borrar();
 
-                            /* if (json.length < 5) {
-                                mostrar_alert("listado", "agotado");
-                            } else { */
-                                habilitar_boton();
-                            /* } */
+                            if (json.length < 5) {
+                                verificar_clientes_agotados();
+                            }
+                            habilitar_boton();
                         });
             }
 

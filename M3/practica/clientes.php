@@ -180,8 +180,8 @@ if ($method == 'GET') {
     
     if ( empty ($_POST ['razonSocial']) || empty ($_POST ['logo']) || empty ($_POST ['direccionCalle']) ||
          empty ($_POST ['direccionAltura']) || empty ($_POST ['direccionCiudad']) || empty ($_POST ['direccionPais']) ||
-         ! isset ($_POST ['activo']) || ! isset ($_POST ['pasivo']) || empty ($_POST ['presidenteNombre']) ||
-         empty ($_POST ['presidenteApellido']) ) {
+         ! isset ($_POST ['activo']) || ! is_numeric ($_POST ['activo']) || ! isset ($_POST ['pasivo']) ||
+         ! is_numeric ($_POST ['pasivo']) || empty ($_POST ['presidenteNombre']) || empty ($_POST ['presidenteApellido']) ) {
         header ('HTTP/1.1 401 Unauthorized');
         exit();
     }
@@ -229,7 +229,7 @@ if ($method == 'GET') {
 
     $id = $_REQUEST ['id'];
 
-    if ($id < 1) {
+    if (! is_numeric ($id) || $id < 1) {
         sleep(2);
         header ('HTTP/1.1 401 Unauthorized');
         exit();
