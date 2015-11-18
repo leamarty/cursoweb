@@ -1,0 +1,8 @@
+/* si se deja solo vcenter, entonces no funciona porque lo sobreescribe bootstrap */
+.table .vcenter {
+	vertical-align: middle;
+}
+
+table > thead > tr > td {
+	font-weight: bold;
+}
