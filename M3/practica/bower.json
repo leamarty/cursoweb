@@ -1,8 +1,8 @@
 {
-  "name": "modulo 3",
-  "version": "0.0.3",
+  "name": "modulo 2",
+  "version": "0.0.2",
   "homepage": "https://github.com/leamarty/cursoweb",
-  "description": "Listado, creación y eliminación de clientes con AJAX y MySQL",
+  "description": "Listado de clientes con AJAX",
   "main": "index.html",
   "keywords": [
     "curso"
