@@ -4,24 +4,25 @@ $json = file_get_contents('clientes.json');
 
 $clientes = json_decode($json, true);
 
-$i = 0;
+$corte = 0;
 $cond = $_REQUEST['cond'];
 $in = $_REQUEST['in'];
+for ($i = $in; $i < count($clientes); $i++) {
 
-foreach ($clientes as $key => $value) {
-    if ($in <= $key) {
-        if ($cond == 'p' && $key % 2 == 1) {
-            $res[$key] = $clientes[$key];
-        } elseif ($clientes[$key]['id'] == 1 && $cond == 'i' || $cond == 'i' && $clientes[$key]['id'] % 2 == 1) {
-            $res[$key] = $clientes[$key];
+    if ($cond == 'p' && $i % 2 == 1) {
+        $res[$i] = $clientes[$i];
+    } elseif ($clientes[$i]['id'] == 1 && $cond == 'i' || $cond == 'i' && $clientes[$i]['id'] % 2 == 1) {
+        $res[$i] = $clientes[$i];
 
-        }
-        if (++$i > 9) {
-            break;
-        }
+    }
+    if (++$corte > 9) {
+        break;
     }
 }
 if ($cond == 'i') {
     sleep(3);
+}
+if ($in > count($clientes)) {
+    $res = 1;
 }
 echo json_encode($res);
