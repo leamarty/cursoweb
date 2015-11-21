@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>La web del curso</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="text/css" rel="stylesheet" href="estilos.css"/>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script>
+        var requesting = 0;
+
+        $(document).ready(function() {
+            $('#boton-buscar').click(function() {
+                $('#boton-buscar').attr('disabled', 'disabled');
+                $('#alerta-verde, #alerta-roja').hide();
+                $.get('autorizacion.php').success(function() {
+                    $('#alerta-roja').hide();
+                    $('#alerta-verde').show();
+
+                    obtenerClientes('impar');
+                    obtenerClientes('par');
+                }).error(function() {
+                    $('#boton-buscar').removeAttr('disabled');
+                    $('#alerta-verde').hide();
+                    $('#alerta-roja').show();
+                });
+            });
+        });
+
+        function obtenerClientes(parImpar) {
+            var tablaClientesBody = $('#tabla-clientes-' + parImpar).find('tbody');
+
+            var parametros = {
+                desde: ((tablaClientesBody.find('tr').length == 1) ? 0 : (tablaClientesBody.find('tr').length  * 2)) + 1,
+                cantidad: 5,
+                filtro: parImpar
+            };
+            requesting++;
+            $.get('clientes.php', parametros).success(function(clientes) {
+                if (tablaClientesBody.find('tr').length == 1) {
+                    tablaClientesBody.html('');
+                }
+                $(clientes).each(function(i, cliente) {
+                    tablaClientesBody.append(
+                        $('<tr>').attr('id', 'tr_' + cliente.id).append(
+                            $('<td>').addClass('text-center').append(
+                                $('<img>').attr('src', cliente.logo)
+                            ),
+                            $('<td>').text(cliente.id),
+                            $('<td>').text(cliente.razonSocial),
+                            $('<td>').text(cliente.presidente.nombre + ' ' + cliente.presidente.apellido),
+                            $('<td>').addClass('text-right').addClass(cliente.activo >= cliente.pasivo ? 'success' : 'danger').text('$ ' + (cliente.activo - cliente.pasivo).toFixed(2)),
+                            $('<td>').addClass('text-center').append(
+                                $('<button>').addClass('btn btn-danger').append(
+                                    $('<i>').addClass('glyphicon glyphicon-remove')
+                                ).click($.proxy(borrarCliente, cliente))
+                            )
+                        )
+                    );
+                });
+                requesting--;
+                if (!requesting) {
+                    $('#boton-buscar').removeAttr('disabled');
+                }
+            });
+        }
+
+        function borrarCliente() {
+            var idCliente = this.id;
+            $.ajax({
+                type: 'DELETE',
+                url: 'clientes.php',
+                data: {id: idCliente}
+            }).success(function () {
+                $('#tr_' + idCliente).remove();
+            }).error(function (error) {
+                alert(JSON.stringify(error));
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="jumbotron text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Telapong S.A.</h1>
+                    <p>Listado de clientes oficiales</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2 text-left">
+                <button id="boton-buscar" class="btn btn-primary btn-lg">Buscar</button>
+            </div>
+            <div class="col-md-10 text-left">
+                <div id="alerta-roja" class="alert alert-danger"><i class="glyphicon glyphicon-warning-sign"></i> El servidor se encuentra ocupado. Por favor aguarde e intente nuevamente</div>
+                <div id="alerta-verde" class="alert alert-success"><i class="glyphicon glyphicon-info-sign"></i> El servidor está disponible para atender el pedido</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1>Impares</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="tabla-clientes-impar" class="table table-bordered table-striped table-hover">
+                            <thead class="text-center bold">
+                                <tr>
+                                    <td></td>
+                                    <td>ID</td>
+                                    <td>Razón social</td>
+                                    <td>Presidente</td>
+                                    <td>Patrimonio neto</td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1>Pares</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="tabla-clientes-par" class="table table-bordered table-striped table-hover">
+                            <thead class="text-center bold">
+                                <tr>
+                                    <td></td>
+                                    <td>ID</td>
+                                    <td>Razón social</td>
+                                    <td>Presidente</td>
+                                    <td>Patrimonio neto</td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
