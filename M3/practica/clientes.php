@@ -77,6 +77,13 @@ class Cliente extends AutoLlenable {
         $db->query($q);
         // TODO chequear errores
     }
+
+    public function agregar(){
+        $db = new mysqli('localhost','root','','cursoweb');
+        $q = 'INSERT INTO clientes (razon_social, logo, direccion_calle, direccion_altura, direccion_ciudad, direccion_pais, activo, pasivo, presidente_nombre, presidente_apellido, fecha_creacion
+    ) VALUES ('.$this->razonSocial.','.$this->logo.','.$this->direccion->calle.','.$this->direccion->altura.','.$this->direccion->ciudad.','.$this->direccion->pais.','.$this->activo.','.$this->pasivo.','.$this->presidente->nombre.','.$this->presidente->apellido.','.','.$this->fechaCreacion.')';
+        $db->query($q);
+    }
 }
 
 class Direccion extends AutoLlenable {
@@ -120,7 +127,23 @@ class ClienteController {
         echo json_encode(Cliente::buscar($this->getDb(), $cantidad, $desde, $filtro));
     }
     public function post() {
+        $datos = array(
+            "razonSocial" => $_POST['razonSocial'],
+            "direccion_calle" => $_POST['calle'],
+            "direccion_altura" => $_POST['altura'],
+            "direccion_ciudad" => $_POST['ciudad'],
+            "direccion_pais" => $_POST['pais'],
+            "presidente_nombre" => $_POST['pres_nombre'],
+            "presidente_apellido" => $_POST['pres_apellido'],
+            "id" => "",
+            "logo" => $_POST['logo'],
+            "activo" => $_POST['activo'],
+            "pasivo" => $_POST['pasivo'],
+            "fechaCreacion" => date(('Y-m-d H:i:s'))
+        );
 
+        $cliente = new Cliente($datos);
+        $cliente->agregar();
     }
     public function delete() {
         parse_str(file_get_contents('php://input'), $_DELETE);
