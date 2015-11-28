@@ -12,6 +12,8 @@
 
         $(document).ready(function() {
             $('#boton-buscar').click(function() {
+                $('div #row_listado').show();
+                $('div #row_form').hide();
                 $('#boton-buscar').attr('disabled', 'disabled');
                 $('#alerta-verde, #alerta-roja').hide();
                 $.get('autorizacion.php').success(function() {
@@ -25,6 +27,11 @@
                     $('#alerta-verde').hide();
                     $('#alerta-roja').show();
                 });
+            });
+            $('#boton-agregar').click(function(){
+                $('div #row_listado').hide();
+                $('div #row_form').show();
+                $('#alerta-verde, #alerta-roja').hide();
             });
         });
 
@@ -43,20 +50,20 @@
                 }
                 $(clientes).each(function(i, cliente) {
                     tablaClientesBody.append(
-                        $('<tr>').attr('id', 'tr_' + cliente.id).append(
-                            $('<td>').addClass('text-center').append(
-                                $('<img>').attr('src', cliente.logo)
-                            ),
-                            $('<td>').text(cliente.id),
-                            $('<td>').text(cliente.razonSocial),
-                            $('<td>').text(cliente.presidente.nombre + ' ' + cliente.presidente.apellido),
-                            $('<td>').addClass('text-right').addClass(cliente.activo >= cliente.pasivo ? 'success' : 'danger').text('$ ' + (cliente.activo - cliente.pasivo).toFixed(2)),
-                            $('<td>').addClass('text-center').append(
-                                $('<button>').addClass('btn btn-danger').append(
-                                    $('<i>').addClass('glyphicon glyphicon-remove')
-                                ).click($.proxy(borrarCliente, cliente))
+                            $('<tr>').attr('id', 'tr_' + cliente.id).append(
+                                    $('<td>').addClass('text-center').append(
+                                            $('<img>').attr('src', cliente.logo)
+                                    ),
+                                    $('<td>').text(cliente.id),
+                                    $('<td>').text(cliente.razonSocial),
+                                    $('<td>').text(cliente.presidente.nombre + ' ' + cliente.presidente.apellido),
+                                    $('<td>').addClass('text-right').addClass(cliente.activo >= cliente.pasivo ? 'success' : 'danger').text('$ ' + (cliente.activo - cliente.pasivo).toFixed(2)),
+                                    $('<td>').addClass('text-center').append(
+                                            $('<button>').addClass('btn btn-danger').append(
+                                                    $('<i>').addClass('glyphicon glyphicon-remove')
+                                            ).click($.proxy(borrarCliente, cliente))
+                                    )
                             )
-                        )
                     );
                 });
                 requesting--;
@@ -81,84 +88,105 @@
     </script>
 </head>
 <body>
-    <div class="jumbotron text-center">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h1>Telapong S.A.</h1>
-                    <p>Listado de clientes oficiales</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="jumbotron text-center">
     <div class="container">
         <div class="row">
-            <div class="col-md-2 text-left">
-                <button id="boton-buscar" class="btn btn-primary btn-lg">Buscar</button>
-            </div>
-            <div class="col-md-10 text-left">
-                <div id="alerta-roja" class="alert alert-danger"><i class="glyphicon glyphicon-warning-sign"></i> El servidor se encuentra ocupado. Por favor aguarde e intente nuevamente</div>
-                <div id="alerta-verde" class="alert alert-success"><i class="glyphicon glyphicon-info-sign"></i> El servidor está disponible para atender el pedido</div>
+            <div class="col-md-12">
+                <h1>Telapong S.A.</h1>
+                <p>Listado de clientes oficiales</p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h1>Impares</h1>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <table id="tabla-clientes-impar" class="table table-bordered table-striped table-hover">
-                            <thead class="text-center bold">
-                                <tr>
-                                    <td></td>
-                                    <td>ID</td>
-                                    <td>Razón social</td>
-                                    <td>Presidente</td>
-                                    <td>Patrimonio neto</td>
-                                    <td></td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2 text-left">
+            <button id="boton-buscar" class="btn btn-primary btn-lg">Buscar</button>
+        </div>
+        <div class="col-md-2 text-left">
+            <button id="boton-agregar" class="btn btn-primary btn-lg">Agregar</button>
+        </div>
+        <div class="col-md-8 text-left">
+            <div id="alerta-roja" class="alert alert-danger"><i class="glyphicon glyphicon-warning-sign"></i> El servidor se encuentra ocupado. Por favor aguarde e intente nuevamente</div>
+            <div id="alerta-verde" class="alert alert-success"><i class="glyphicon glyphicon-info-sign"></i> El servidor está disponible para atender el pedido</div>
+        </div>
+    </div>
+    <div class="row" id="row_listado">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Impares</h1>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h1>Pares</h1>
-                    </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tabla-clientes-impar" class="table table-bordered table-striped table-hover">
+                        <thead class="text-center bold">
+                        <tr>
+                            <td></td>
+                            <td>ID</td>
+                            <td>Razón social</td>
+                            <td>Presidente</td>
+                            <td>Patrimonio neto</td>
+                            <td></td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <table id="tabla-clientes-par" class="table table-bordered table-striped table-hover">
-                            <thead class="text-center bold">
-                                <tr>
-                                    <td></td>
-                                    <td>ID</td>
-                                    <td>Razón social</td>
-                                    <td>Presidente</td>
-                                    <td>Patrimonio neto</td>
-                                    <td></td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Pares</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tabla-clientes-par" class="table table-bordered table-striped table-hover">
+                        <thead class="text-center bold">
+                        <tr>
+                            <td></td>
+                            <td>ID</td>
+                            <td>Razón social</td>
+                            <td>Presidente</td>
+                            <td>Patrimonio neto</td>
+                            <td></td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+    <div class="row" id="row_form" style="display: none">
+        <form method="POST" action="clientes.php">
+            <h1>Ingrese sus datos</h1><br><br>
+            Nombre Completo:<br>
+            Nombre <input type="text" name="nombre"> Apellido <input type="text" name="apellido"><br><br>
+            Razon Social:<br>
+            Nombre <input type="text" name="razonSocial"><br><br>
+            Direccion:<br>
+            Calle <input type="text" name="calle"> Altura <input type="text" name="altura"> Ciudad <input type="text" name="ciudad"> Pais <input type="text" name="pais"><br><br>
+            Finanzas:<br>
+            Activo <input type="text" name="activo"> Pasivo <input type="text" name="pasivo"><br><br>
+            Presidente:<br>
+            Nombre <input type="text" name="pres_nombre"> Apellido <input type="text" name="pres_apellido"><br><br>
+            Logo: <br>
+            Link <input type="text" name="logo"><br><br>
+            <input type="submit" value="Ingresar">
+        </form>
+    </div>
+</div>
 </body>
 </html>
