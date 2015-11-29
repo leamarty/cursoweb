@@ -1,0 +1,19 @@
+{
+  "name": "modulo 4",
+  "version": "0.0.4",
+  "homepage": "https://github.com/leamarty/cursoweb",
+  "description": "Agregamos Laravel al backend",
+  "main": "index.html",
+  "keywords": [
+    "curso"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.5"
+  }
+}

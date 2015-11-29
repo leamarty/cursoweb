@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>La web del curso</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="text/css" rel="stylesheet" href="estilos.css"/>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script>
+        var requesting = 0;
+
+        $(document).ready(function () {
+            $('#boton-buscar').click(function () {
+                $('#boton-buscar').attr('disabled', 'disabled');
+                $('#alerta-verde, #alerta-roja').hide();
+                $('#alerta-roja').hide();
+                $('#alerta-verde').show();
+
+                obtenerClientes('impar');
+                obtenerClientes('par');
+            });
+            $('#menu-listado').click(function () {
+                $('#div-nuevo').hide();
+                $('#div-listado').show();
+                $('#menu-nuevo').removeClass('active');
+                $('#menu-listado').addClass('active');
+            });
+            $('#menu-nuevo').click(function () {
+                $('#div-listado').hide();
+                $('#div-nuevo').show();
+                $('#menu-listado').removeClass('active');
+                $('#menu-nuevo').addClass('active');
+            });
+
+            $('#menu-nuevo').click();
+
+            $.getJSON('api/presidente', function(response) {
+                $(response).each(function(key, presidente) {
+                    $('#presidente_id').append(
+                        $('<option>').attr('value', presidente.id).text(presidente.nombre + ' ' + presidente.apellido)
+                    )
+                });
+            });
+        });
+
+        function obtenerClientes(parImpar) {
+            var tablaClientesBody = $('#tabla-clientes-' + parImpar).find('tbody');
+
+            var parametros = {
+                desde: ((tablaClientesBody.find('tr').length == 1) ? 0 : (tablaClientesBody.find('tr').length * 2)) + 1,
+                cantidad: 5,
+                filtro: parImpar
+            };
+            requesting++;
+            $.get('api/cliente', parametros).success(function (clientes) {
+                if (tablaClientesBody.find('tr').length == 1) {
+                    tablaClientesBody.html('');
+                }
+                $(clientes).each(function (i, cliente) {
+                    tablaClientesBody.append(
+                        $('<tr>').attr('id', 'tr_' + cliente.id).append(
+                            $('<td>').addClass('text-center').append(
+                                $('<img>').attr('src', cliente.logo)
+                            ),
+                            $('<td>').text(cliente.id),
+                            $('<td>').text(cliente.razon_social),
+                            $('<td>').text(cliente.presidente.nombre + ' ' + cliente.presidente.apellido),
+                            $('<td>').addClass('text-right').addClass(cliente.activo >= cliente.pasivo ? 'success' : 'danger').text('$ ' + (cliente.activo - cliente.pasivo).toFixed(2)),
+                            $('<td>').addClass('text-center').append(
+                                $('<button>').addClass('btn btn-danger').append(
+                                    $('<i>').addClass('glyphicon glyphicon-remove')
+                                ).click($.proxy(borrarCliente, cliente))
+                            )
+                        )
+                    );
+                });
+                requesting--;
+                if (!requesting) {
+                    $('#boton-buscar').removeAttr('disabled');
+                }
+            });
+        }
+
+        function borrarCliente() {
+            var idCliente = this.id;
+            $.ajax({
+                type: 'DELETE',
+                url: 'api/cliente/' + idCliente
+            }).success(function (response) {
+                $('#tr_' + response.id).remove();
+            }).error(function (error) {
+                alert(JSON.stringify(error));
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="jumbotron text-center">
+                    <h1>Telapong S.A.</h1>
+                    <p>Listado de clientes oficiales</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <nav class="navbar navbar-default">
+                    <ul class="nav navbar-nav">
+                        <li id="menu-listado" class="active"><a href="#">Listado</a></li>
+                        <li id="menu-nuevo"><a href="#">Nuevo</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="div-listado">
+            <div class="row">
+                <div class="col-md-2 text-left">
+                    <button id="boton-buscar" class="btn btn-primary btn-lg">Buscar</button>
+                </div>
+                <div class="col-md-10 text-left">
+                    <div id="alerta-roja" class="alert alert-danger"><i class="glyphicon glyphicon-warning-sign"></i> El
+                        servidor se encuentra ocupado. Por favor aguarde e intente nuevamente
+                    </div>
+                    <div id="alerta-verde" class="alert alert-success"><i class="glyphicon glyphicon-info-sign"></i> El
+                        servidor está disponible para atender el pedido
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1>Impares</h1>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table id="tabla-clientes-impar" class="table table-bordered table-striped table-hover">
+                                <thead class="text-center bold">
+                                    <tr>
+                                        <td></td>
+                                        <td>ID</td>
+                                        <td>Razón social</td>
+                                        <td>Presidente</td>
+                                        <td>Patrimonio neto</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1>Pares</h1>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table id="tabla-clientes-par" class="table table-bordered table-striped table-hover">
+                                <thead class="text-center bold">
+                                    <tr>
+                                        <td></td>
+                                        <td>ID</td>
+                                        <td>Razón social</td>
+                                        <td>Presidente</td>
+                                        <td>Patrimonio neto</td>
+                                        <td></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="div-nuevo" style="display: none;">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="nuevo-alerta-roja" class="alert alert-danger">
+                        <i class="glyphicon glyphicon-warning-sign"></i>
+                        Hubo un error al agregar el cliente a la base de datos
+                    </div>
+                    <div id="nuevo-alerta-verde" class="alert alert-success">
+                        <i class="glyphicon glyphicon-info-sign"></i>
+                        Cliente agregado exitosamente
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <form id="form-nuevo" role="form">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for='razon_social'>Razon social:</label>
+                                <input type='text' class="form-control" id="razon_social" name="razon_social">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for='logo'>Logo:</label>
+                                <input type='text' class="form-control" id="logo" name="logo">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-3">
+                                <label for='direccion_calle'>Calle:</label>
+                                <input type='text' class="form-control" id="direccion_calle" name="direccion_calle">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for='direccion_altura'>Altura:</label>
+                                <input type='text' class="form-control" id="direccion_altura" name="direccion_altura">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for='direccion_ciudad'>Ciudad:</label>
+                                <input type='text' class="form-control" id="direccion_ciudad" name="direccion_ciudad">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for='pais_id'>Pais:</label>
+                                <input type='text' class="form-control" id="pais_id" name="pais_id">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-3">
+                                <label for='activo'>Activo:</label>
+                                <input type='text' class="form-control" id="activo" name="activo">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for='pasivo'>Pasivo:</label>
+                                <input type='text' class="form-control" id="pasivo" name="pasivo">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for='presidente_id'>Presidente:</label>
+                                <select class="form-control" id="presidente_id" name="presidente_id">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <button id="boton-guardar" class="btn btn-primary">Guardar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
