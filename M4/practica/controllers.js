@@ -205,6 +205,8 @@ clientesProviderApp.controller('NuevoCtrl', ['$scope', '$http',
         $scope.alert_shown = '';
         $scope.campos = [];
 
+        // puto el que lee
+
         $scope.alta_cliente = function () {
             $http.post('api/cliente', $scope.campos
             ).error(function () {
