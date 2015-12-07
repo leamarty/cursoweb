@@ -1,10 +1,21 @@
-#boton-buscar {
-	padding: 13px 15px;
+/* si se deja solo vcenter, entonces no funciona porque lo sobreescribe bootstrap */
+.vcenter {
+    vertical-align: middle !important;
 }
+
+table > thead > tr > td {
+    font-weight: bold !important;
+}
+
+.nopadding {
+    padding: 0 !important;
+}
+
 .alert {
-	display: none;
-	margin-bottom: 0 !important;
+    display: none;
+    margin-bottom: 0 !important;
 }
-.bold {
-	font-weight: bold;
+
+.jumbotron {
+    margin-bottom: 10px !important;
 }

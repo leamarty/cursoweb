@@ -7,6 +7,9 @@ use Eloquent;
 class Pais extends Eloquent
 {
     protected $table = 'paises';
-
     public $timestamps = false;
+
+    protected $hidden = array(
+        'id'
+    );
 }

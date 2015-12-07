@@ -1,263 +1,219 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <title>La web del curso</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link type="text/css" rel="stylesheet" href="estilos.css"/>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular/angular-animate.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="controllers.js"></script>
     <script>
-        var requesting = 0;
-
-        $(document).ready(function () {
-            $('#boton-buscar').click(function () {
-                $('#boton-buscar').attr('disabled', 'disabled');
-                $('#alerta-verde, #alerta-roja').hide();
-                $('#alerta-roja').hide();
-                $('#alerta-verde').show();
-
-                obtenerClientes('impar');
-                obtenerClientes('par');
-            });
-            $('#menu-listado').click(function () {
-                $('#div-nuevo').hide();
-                $('#div-listado').show();
-                $('#menu-nuevo').removeClass('active');
-                $('#menu-listado').addClass('active');
-            });
-            $('#menu-nuevo').click(function () {
-                $('#div-listado').hide();
-                $('#div-nuevo').show();
-                $('#menu-listado').removeClass('active');
-                $('#menu-nuevo').addClass('active');
-            });
-
-            $('#menu-nuevo').click();
-
-            $.getJSON('api/presidente', function(response) {
-                $(response).each(function(key, presidente) {
-                    $('#presidente_id').append(
-                        $('<option>').attr('value', presidente.id).text(presidente.nombre + ' ' + presidente.apellido)
-                    )
-                });
-            });
-        });
-
-        function obtenerClientes(parImpar) {
-            var tablaClientesBody = $('#tabla-clientes-' + parImpar).find('tbody');
-
-            var parametros = {
-                desde: ((tablaClientesBody.find('tr').length == 1) ? 0 : (tablaClientesBody.find('tr').length * 2)) + 1,
-                cantidad: 5,
-                filtro: parImpar
-            };
-            requesting++;
-            $.get('api/cliente', parametros).success(function (clientes) {
-                if (tablaClientesBody.find('tr').length == 1) {
-                    tablaClientesBody.html('');
-                }
-                $(clientes).each(function (i, cliente) {
-                    tablaClientesBody.append(
-                        $('<tr>').attr('id', 'tr_' + cliente.id).append(
-                            $('<td>').addClass('text-center').append(
-                                $('<img>').attr('src', cliente.logo)
-                            ),
-                            $('<td>').text(cliente.id),
-                            $('<td>').text(cliente.razon_social),
-                            $('<td>').text(cliente.presidente.nombre + ' ' + cliente.presidente.apellido),
-                            $('<td>').addClass('text-right').addClass(cliente.activo >= cliente.pasivo ? 'success' : 'danger').text('$ ' + (cliente.activo - cliente.pasivo).toFixed(2)),
-                            $('<td>').addClass('text-center').append(
-                                $('<button>').addClass('btn btn-danger').append(
-                                    $('<i>').addClass('glyphicon glyphicon-remove')
-                                ).click($.proxy(borrarCliente, cliente))
-                            )
-                        )
-                    );
-                });
-                requesting--;
-                if (!requesting) {
-                    $('#boton-buscar').removeAttr('disabled');
-                }
-            });
-        }
-
-        function borrarCliente() {
-            var idCliente = this.id;
-            $.ajax({
-                type: 'DELETE',
-                url: 'api/cliente/' + idCliente
-            }).success(function (response) {
-                $('#tr_' + response.id).remove();
-            }).error(function (error) {
-                alert(JSON.stringify(error));
-            });
-        }
+        // $(document).ready(function () {
+        // });
     </script>
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="jumbotron text-center">
-                    <h1>Telapong S.A.</h1>
-                    <p>Listado de clientes oficiales</p>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <nav class="navbar navbar-default">
-                    <ul class="nav navbar-nav">
-                        <li id="menu-listado" class="active"><a href="#">Listado</a></li>
-                        <li id="menu-nuevo"><a href="#">Nuevo</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-        <div id="div-listado">
-            <div class="row">
-                <div class="col-md-2 text-left">
-                    <button id="boton-buscar" class="btn btn-primary btn-lg">Buscar</button>
-                </div>
-                <div class="col-md-10 text-left">
-                    <div id="alerta-roja" class="alert alert-danger"><i class="glyphicon glyphicon-warning-sign"></i> El
-                        servidor se encuentra ocupado. Por favor aguarde e intente nuevamente
-                    </div>
-                    <div id="alerta-verde" class="alert alert-success"><i class="glyphicon glyphicon-info-sign"></i> El
-                        servidor está disponible para atender el pedido
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h1>Impares</h1>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <table id="tabla-clientes-impar" class="table table-bordered table-striped table-hover">
-                                <thead class="text-center bold">
-                                    <tr>
-                                        <td></td>
-                                        <td>ID</td>
-                                        <td>Razón social</td>
-                                        <td>Presidente</td>
-                                        <td>Patrimonio neto</td>
-                                        <td></td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h1>Pares</h1>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <table id="tabla-clientes-par" class="table table-bordered table-striped table-hover">
-                                <thead class="text-center bold">
-                                    <tr>
-                                        <td></td>
-                                        <td>ID</td>
-                                        <td>Razón social</td>
-                                        <td>Presidente</td>
-                                        <td>Patrimonio neto</td>
-                                        <td></td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="text-center" colspan="7">Sin clientes. Debe realizar una búsqueda.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="div-nuevo" style="display: none;">
-            <div class="row">
-                <div class="col-md-12">
-                    <div id="nuevo-alerta-roja" class="alert alert-danger">
-                        <i class="glyphicon glyphicon-warning-sign"></i>
-                        Hubo un error al agregar el cliente a la base de datos
-                    </div>
-                    <div id="nuevo-alerta-verde" class="alert alert-success">
-                        <i class="glyphicon glyphicon-info-sign"></i>
-                        Cliente agregado exitosamente
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <form id="form-nuevo" role="form">
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for='razon_social'>Razon social:</label>
-                                <input type='text' class="form-control" id="razon_social" name="razon_social">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for='logo'>Logo:</label>
-                                <input type='text' class="form-control" id="logo" name="logo">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-md-3">
-                                <label for='direccion_calle'>Calle:</label>
-                                <input type='text' class="form-control" id="direccion_calle" name="direccion_calle">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for='direccion_altura'>Altura:</label>
-                                <input type='text' class="form-control" id="direccion_altura" name="direccion_altura">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for='direccion_ciudad'>Ciudad:</label>
-                                <input type='text' class="form-control" id="direccion_ciudad" name="direccion_ciudad">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for='pais_id'>Pais:</label>
-                                <input type='text' class="form-control" id="pais_id" name="pais_id">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-md-3">
-                                <label for='activo'>Activo:</label>
-                                <input type='text' class="form-control" id="activo" name="activo">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for='pasivo'>Pasivo:</label>
-                                <input type='text' class="form-control" id="pasivo" name="pasivo">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for='presidente_id'>Presidente:</label>
-                                <select class="form-control" id="presidente_id" name="presidente_id">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 text-right">
-                                <button id="boton-guardar" class="btn btn-primary">Guardar</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+<div class="container-fluid" data-ng-app="clientesProviderApp" data-ng-controller="SubtitleCtrl">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="jumbotron text-center">
+                <h1>Telapong S.A.</h1>
+                <p>{{subtitulo}}</p>
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <uib-tabset>
+                <uib-tab>
+                    <uib-tab-heading data-ng-click="modificar_subtitulo('listado')">
+                        <span class="glyphicon glyphicon-search"></span> Listado de clientes
+                    </uib-tab-heading>
+                    <div class="row" data-ng-controller="ListadoCtrl">
+                        <div class="col-xs-12">
+                            <div class="row" style="padding-top: 10px;">
+                                <div class="col-sm-1">
+                                    <button class="btn btn-primary btn-lg" data-ng-click="boton_buscar()" data-ng-class="{'disabled': boton_buscar_disabled}">
+                                        <span class="glyphicon glyphicon-search"></span> Buscar
+                                    </button>
+                                </div>
+                                <div class="col-sm-10 col-sm-offset-1">
+                                    <div class="alert alert-info" data-ng-class="{'show': alert_shown == 'realice-busqueda'}">
+                                        <span class="glyphicon glyphicon-info-sign"></span> Realice una búsqueda para cargar la lista de clientes.
+                                    </div>
+                                    <div class="alert alert-info" data-ng-class="{'show': alert_shown == 'comprobando-disponibilidad'}">
+                                        <span class="glyphicon glyphicon-info-sign"></span> Comprobando disponibilidad del servidor. Por favor, espere.
+                                    </div>
+                                    <div class="alert alert-danger" data-ng-class="{'show': alert_shown == 'ocupado'}">
+                                        <span class="glyphicon glyphicon-remove"></span> El servidor se encuentra ocupado. Por favor, espere un momento e intente nuevamente.
+                                    </div>
+                                    <div class="alert alert-success" data-ng-class="{'show': alert_shown == 'disponible'}">
+                                        <span class="glyphicon glyphicon-ok"></span> El servidor esta disponible para atender el pedido.
+                                    </div>
+                                    <div class="alert alert-danger" data-ng-class="{'show': alert_shown == 'error'}">
+                                        <span class="glyphicon glyphicon-remove"></span> Hubo un error. Intente nuevamente.
+                                    </div>
+                                    <div class="alert alert-warning" data-ng-class="{'show': alert_shown == 'agotado'}">
+                                        <span class="glyphicon glyphicon-warning-sign"></span> No hay más clientes.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h2>Impares</h2>
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead class="text-center">
+                                        <tr>
+                                            <td></td>
+                                            <td class="vcenter">ID</td>
+                                            <td class="vcenter">Razón social</td>
+                                            <td class="vcenter visible-lg">Dirección</td>
+                                            <td class="vcenter">Presidente</td>
+                                            <td class="vcenter">Patrimonio neto</td>
+                                            <!-- <td class="vcenter visible-lg">Inicio de act.</td> -->
+                                            <td class="vcenter">Eliminar</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr data-ng-repeat="x in clientes | filtrarParidad: 'impar' | orderBy: '-id'">
+                                            <td class="vcenter text-center nopadding">
+                                                <img src="" data-ng-src="{{x.logo.replace('w=32', 'w=36').replace('h=32', 'h=36')}}" alt="logo">
+                                            </td>
+                                            <td class="vcenter">{{x.id}}</td>
+                                            <td class="vcenter">{{x.razon_social}}</td>
+                                            <td class="vcenter visible-lg">{{x.direccion_calle + ' ' + x.direccion_altura + ', ' + x.ciudad.nombre}}</td>
+                                            <td class="vcenter">{{x.presidente.nombre + " " + x.presidente.apellido}}</td>
+                                            <td class="vcenter text-right {{x.activo >= x.pasivo ? 'success' : 'danger'}}">$ {{(x.activo - x.pasivo).toFixed(2)}}</td>
+                                            <td class="vcenter text-center">
+                                                <button class="btn btn-danger" data-ng-click="borrar_cliente(x.id)" data-uib-tooltip="Este proceso es irreversible. Haga click nuevamente para borrar el cliente" data-tooltip-placement="left" data-tooltip-trigger="click" data-tooltip-enable="!remove_cliente_warning_shown">
+                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h2>Pares</h2>
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead class="text-center">
+                                        <tr>
+                                            <td></td>
+                                            <td class="vcenter">ID</td>
+                                            <td class="vcenter">Razón social</td>
+                                            <td class="vcenter visible-lg">Dirección</td>
+                                            <td class="vcenter">Presidente</td>
+                                            <td class="vcenter">Patrimonio neto</td>
+                                            <!-- <td class="vcenter visible-lg">Inicio de act.</td> -->
+                                            <td class="vcenter">Eliminar</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr data-ng-repeat="x in clientes | filtrarParidad: 'par' | orderBy: '-id'">
+                                            <td class="vcenter text-center nopadding">
+                                                <img src="" data-ng-src="{{x.logo.replace('w=32', 'w=36').replace('h=32', 'h=36')}}" alt="logo">
+                                            </td>
+                                            <td class="vcenter">{{x.id}}</td>
+                                            <td class="vcenter">{{x.razon_social}}</td>
+                                            <td class="vcenter visible-lg">{{x.direccion_calle + ' ' + x.direccion_altura + ', ' + x.ciudad.nombre}}</td>
+                                            <td class="vcenter">{{x.presidente.nombre + " " + x.presidente.apellido}}</td>
+                                            <td class="vcenter text-right {{x.activo >= x.pasivo ? 'success' : 'danger'}}">$ {{(x.activo - x.pasivo).toFixed(2)}}</td>
+                                            <td class="vcenter text-center" data-toggle="tooltip" title="Este proceso es irreversible" data-placement="left">
+                                                <button class="btn btn-danger" data-ng-click="borrar_cliente(x.id)" data-uib-tooltip="Este proceso es irreversible. Haga click nuevamente para borrar el cliente" data-tooltip-placement="left" data-tooltip-trigger="click" data-tooltip-enable="!remove_cliente_warning_shown">
+                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </uib-tab>
+                <uib-tab>
+                    <uib-tab-heading data-ng-click="modificar_subtitulo('nuevo')">
+                        <span class="glyphicon glyphicon-plus"></span> Nuevo cliente
+                    </uib-tab-heading>
+                    <div class="row" data-ng-controller="NuevoCtrl">
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="alert alert-success" data-ng-class="{'show': alert_shown == 'cargado-exito'}">
+                                        <span class="glyphicon glyphicon-ok"></span> El cliente fue agregado exitosamente.
+                                    </div>
+                                    <div class="alert alert-danger" data-ng-class="{'show': alert_shown == 'cargado-error'}">
+                                        <span class="glyphicon glyphicon-remove"></span> Hubo un error al cargar el cliente.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <h2>Nuevo Cliente</h2>
+                                    <form data-ng-submit="alta_cliente()">
+                                        <div class="row">
+                                            <div class="col-sm-6 form-group">
+                                                <label class="control-label visible-lg visible-md" for="razon-social">Razón social:</label>
+                                                <input type="text" class="form-control" id="razon-social" placeholder="Razón social" data-ng-model="campos.razon_social">
+                                            </div>
+                                            <div class="col-sm-6 form-group">
+                                                <label class="control-label visible-lg visible-md" for="logo">Logo:</label>
+                                                <input type="text" class="form-control" id="logo" placeholder="Logo" data-ng-model="campos.logo">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-4 form-group">
+                                                <label class="control-label visible-lg visible-md" for="direccion-calle">Calle:</label>
+                                                <input type="text" class="form-control" id="direccion-calle" placeholder="Calle" data-ng-model="campos.direccion_calle">
+                                            </div>
+                                            <div class="col-sm-2 form-group">
+                                                <label class="control-label visible-lg visible-md" for="direccion-altura">Altura:</label>
+                                                <input type="text" class="form-control" id="direccion-altura" placeholder="Altura" data-ng-model="campos.direccion_altura">
+                                            </div>
+                                            <div class="col-sm-6 form-group">
+                                                <label class="control-label visible-lg visible-md" for="ciudad-id">Ciudad:</label>
+                                                <select class="form-control" id="ciudad-id" data-ng-model="campos.ciudad_id">
+                                                    <option value="">Ciudad</option>
+                                                    <option data-ng-repeat="x in ciudades" value="{{x.id}}">{{x.nombre + ', ' + x.pais.nombre}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6 form-group">
+                                                <label class="control-label visible-lg visible-md" for="activo">Activo:</label>
+                                                <input type="text" class="form-control" id="activo" placeholder="Activo" data-ng-model="campos.activo">
+                                            </div>
+                                            <div class="col-sm-6 form-group">
+                                                <label class="control-label visible-lg visible-md" for="pasivo">Pasivo:</label>
+                                                <input type="text" class="form-control" id="pasivo" placeholder="Pasivo" data-ng-model="campos.pasivo">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12 form-group">
+                                                <label class="control-label visible-lg visible-md" for="presidente-id">Presidente del nombre:</label>
+                                                <select class="form-control" id="presidente-id" data-ng-model="campos.presidente_id">
+                                                    <option value="">Nombre del presidente</option>
+                                                    <option data-ng-repeat="x in presidentes" value="{{x.id}}">{{x.nombre + ' ' + x.apellido}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12 text-right">
+                                                <button class="btn btn-primary">Guardar</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+    </div>
+</div>
 </body>
 </html>
