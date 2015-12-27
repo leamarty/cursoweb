@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="cursoweb">
+<head>
+    <title>La web del curso</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link type="text/css" rel="stylesheet" href="estilos.css"/>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Vendor -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.min.js"></script>
+    <script src="bower_components/select2/select2.min.js"></script>
+    <script src="bower_components/angular-ui-select2/src/select2.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/restangular/dist/restangular.min.js"></script>
+    <!-- App -->
+    <script src="js/angular-app.js"></script>
+    <script src="js/controllers/main-controller.js"></script>
+    <script src="js/routes.js"></script>
+    <script src="js/directivas/ocultar.js"></script>
+    <!-- Controllers -->
+    <script src="js/controllers/cliente/listado.js"></script>
+    <script src="js/controllers/cliente/nuevo.js"></script>
+</head>
+<body>
+    <div class="container" ng-controller="MainController">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="jumbotron text-center">
+                    <h1>Telapong S.A.</h1>
+                    <p>Listado de clientes oficiales</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <nav class="navbar navbar-default">
+                    <ul class="nav navbar-nav">
+                        <li id="menu-listado" class="{{ menuActivo == 'cliente_listado' ? 'active' : '' }}">
+                            <a href="#/cliente/listado">Listado</a>
+                        </li>
+                        <li id="menu-nuevo" class="{{ menuActivo == 'cliente_nuevo' ? 'active' : '' }}">
+                            <a href="#/cliente/nuevo">Nuevo</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div ng-view></div>
+    </div>
+</body>
+</html>
