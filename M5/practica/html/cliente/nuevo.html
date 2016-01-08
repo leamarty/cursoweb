@@ -1,8 +1,26 @@
 <div class="row">
-    <div class="col-lg-3" ng-repeat="input in inputs">
+    <div class="col-lg-2">
         <div class="input-group">
-            <span class="input-group-addon" id="{{ input.id }}">{{ input.symbol }}</span>
-            <input type="{{ input.type }}" class="form-control" placeholder="{{ input.placeholder }}" aria-describedby="basic-addon1">
+            <span class="input-group-addon" id="username">@</span>
+            <input type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="input-group">
+            <span class="input-group-addon" id="password">●</span>
+            <input type="password" class="form-control" placeholder="Password" aria-describedby="basic-addon1">
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="input-group">
+            <span class="input-group-addon" id="saldo_positivo">$+</span>
+            <input type="text" class="form-control" placeholder="Saldo Positivo" aria-describedby="basic-addon1">
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="input-group">
+            <span class="input-group-addon" id="saldo_negativo">$-</span>
+            <input type="text" class="form-control" placeholder="Saldo Negativo" aria-describedby="basic-addon1">
         </div>
     </div>
 </div>

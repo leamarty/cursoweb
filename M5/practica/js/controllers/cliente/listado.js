@@ -19,5 +19,6 @@ cursoweb.controller('ClienteListado', function ($scope) {
         'Razon Social',
         'Saldo Positivo',
         'Saldo Negativo',
+        'Borrar'
     ]
 });

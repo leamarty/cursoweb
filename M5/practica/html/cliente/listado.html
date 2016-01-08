@@ -2,7 +2,7 @@
     <thead><th ng-repeat="head in headers">{{ head }}</th></thead>
     <tbody>
         <tr ng-repeat="cliente in clientes">
-            <td ng-repeat="(key, value) in cliente">{{ value }}</td>
+            <td>{{ cliente.id }}</td><td>{{ cliente.razon_social }}</td><td>{{ cliente.saldo_positivo }}</td><td>{{ cliente.saldo_negativo }}</td><td><button class="btn btn-danger">X</button></td>
         </tr>
     </tbody>
 </table>
