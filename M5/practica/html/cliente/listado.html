@@ -1,9 +1,8 @@
-<table>
-    <thead></thead>
+<table class="table table-striped table-bordered">
+    <thead><th ng-repeat="head in headers">{{ head }}</th></thead>
     <tbody>
         <tr ng-repeat="cliente in clientes">
-            <td>{{ cliente.id }}</td>
-            <td>{{ cliente.razon_social }}</td>
+            <td ng-repeat="(key, value) in cliente">{{ value }}</td>
         </tr>
     </tbody>
 </table>
