@@ -1,9 +1,104 @@
-<table>
-    <thead></thead>
-    <tbody>
-        <tr ng-repeat="cliente in clientes">
-            <td>{{ cliente.id }}</td>
-            <td>{{ cliente.razon_social }}</td>
-        </tr>
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-2 text-left">
+        <button class="btn btn-primary btn-lg" ng-click="pedirClientes()">
+            <span class="glyphicon glyphicon-search"></span>
+            Buscar
+        </button>
+    </div>
+    <div class="col-md-10 text-left">
+        <div id="alerta-roja" class="alert alert-danger">
+            <span class="glyphicon glyphicon-warning-sign"></span>
+            El servidor se encuentra ocupado. Por favor aguarde e intente nuevamente
+        </div>
+        <div id="alerta-verde" class="alert alert-success">
+            <span class="glyphicon glyphicon-info-sign"></span>
+            El servidor está disponible para atender el pedido
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Impares</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="text-center">
+                    <tr>
+                        <td></td>
+                        <td>ID</td>
+                        <td>Razón social</td>
+                        <td>Presidente</td>
+                        <td>Patrimonio neto</td>
+                        <td></td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-show="clientes.length == 0">
+                        <td class="text-center" colspan="6">Sin clientes. Debe realizar una búsqueda.</td>
+                    </tr>
+                    <tr ng-repeat="cliente in clientes" ng-show="cliente.id % 2 == 1">
+                        <td class="vcenter">
+                            <img src="{{ cliente.logo }}">
+                        </td>
+                        <td class="vcenter">{{ cliente.id }}</td>
+                        <td class="vcenter">{{ cliente.razonSocial }}</td>
+                        <td class="vcenter">{{ cliente.presidente.nombre + cliente.presidente.apellido }}</td>
+                        <td class="vcenter text-right">{{ (cliente.activo - cliente.pasivo).toFixed(2) }}</td>
+                        <td class="vcenter">
+                            <button class="btn btn-danger" ng-click="borrarCliente(cliente, $index)">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Pares</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="text-center">
+                    <tr>
+                        <td></td>
+                        <td>ID</td>
+                        <td>Razón social</td>
+                        <td>Presidente</td>
+                        <td>Patrimonio neto</td>
+                        <td></td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-show="clientes.length == 0">
+                        <td class="text-center" colspan="6">Sin clientes. Debe realizar una búsqueda.</td>
+                    </tr>
+                    <tr ng-repeat="cliente in clientes" ng-show="cliente.id % 2 == 0">
+                        <td class="vcenter">
+                            <img src="{{ cliente.logo }}">
+                        </td>
+                        <td class="vcenter">{{ cliente.id }}</td>
+                        <td class="vcenter">{{ cliente.razonSocial }}</td>
+                        <td class="vcenter">{{ cliente.presidente.nombre + cliente.presidente.apellido }}</td>
+                        <td class="vcenter text-right">{{ (cliente.activo - cliente.pasivo).toFixed(2) }}</td>
+                        <td class="vcenter">
+                            <button class="btn btn-danger" ng-click="borrarCliente(cliente, $index)">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
