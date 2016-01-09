@@ -37,11 +37,17 @@
             <div class="col-md-12">
                 <nav class="navbar navbar-default">
                     <ul class="nav navbar-nav">
-                        <li id="menu-listado" class="{{ menuActivo == 'cliente_listado' ? 'active' : '' }}">
-                            <a href="#/cliente/listado">Listado</a>
+                        <li class="{{ menuActivo == 'cliente_listado' ? 'active' : '' }}">
+                            <a href="#/cliente/listado">
+                                <span class="glyphicon glyphicon-th-list"></span>
+                                Listado
+                            </a>
                         </li>
-                        <li id="menu-nuevo" class="{{ menuActivo == 'cliente_nuevo' ? 'active' : '' }}">
-                            <a href="#/cliente/nuevo">Nuevo</a>
+                        <li class="{{ menuActivo == 'cliente_nuevo' ? 'active' : '' }}">
+                            <a href="#/cliente/nuevo">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Nuevo
+                            </a>
                         </li>
                     </ul>
                 </nav>

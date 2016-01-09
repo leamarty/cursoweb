@@ -1,10 +1,16 @@
-#boton-buscar {
-	padding: 13px 15px;
-}
 .alert {
 	display: none;
 	margin-bottom: 0 !important;
 }
-.bold {
-	font-weight: bold;
+
+table > thead > tr > td {
+    font-weight: bold !important;
+}
+
+.nopadding {
+    padding: 0 !important;
+}
+
+.vcenter {
+    vertical-align: middle !important;
 }
