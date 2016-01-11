@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link type="text/css" rel="stylesheet" href="estilos.css"/>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/select2/select2.css">
+    <link rel="stylesheet" href="bower_components/select2/select2-bootstrap.css">
     <!-- Vendor -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/angular/angular.js"></script>
@@ -13,6 +15,7 @@
     <script src="bower_components/select2/select2.min.js"></script>
     <script src="bower_components/angular-ui-select2/src/select2.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/angular-underscore-module/angular-underscore-module.js"></script>
     <script src="bower_components/restangular/dist/restangular.min.js"></script>
     <!-- App -->
     <script src="js/angular-app.js"></script>
@@ -22,6 +25,11 @@
     <!-- Controllers -->
     <script src="js/controllers/cliente/listado.js"></script>
     <script src="js/controllers/cliente/nuevo.js"></script>
+    <script src="js/controllers/cliente/editar.js"></script>
+    <!-- Services -->
+    <script src="js/services/cliente.js"></script>
+    <script src="js/services/pais.js"></script>
+    <script src="js/services/presidente.js"></script>
 </head>
 <body>
     <div class="container" ng-controller="MainController">

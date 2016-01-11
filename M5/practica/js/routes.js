@@ -6,14 +6,21 @@ cursoweb.config(function ($routeProvider) {
         })
         .when('/cliente/nuevo', {
             templateUrl: 'html/cliente/nuevo.html',
-            controller: 'ClienteNuevo'
+            controller: 'ClienteNuevo',
+            resolve: {
+                Paises: function (Pais) {return Pais.getList();},
+                Presidentes: function (Presidente) {return Presidente.getList();}
+            }
         })
-        /*
         .when('/cliente/:id', {
-            templateUrl: '',
-            controller: ''
+            templateUrl: 'html/cliente/nuevo.html',
+            controller: 'ClienteEditar',
+            resolve: {
+                Cliente: function(Cliente, $route) {return Cliente.one($route.current.params.id).get();},
+                Paises: function (Pais) {return Pais.getList();},
+                Presidentes: function (Presidente) {return Presidente.getList();}
+            }
         })
-        */
         .otherwise({
             redirectTo: '/cliente/listado'
         })
